@@ -10,7 +10,6 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.FontRenderer;
 import net.minecraft.src.Tessellator;
-import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
@@ -98,7 +97,8 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 			}
 			try (InputStream inputStream = Files.newInputStream(path)) {
 				BufferedImage image = ImageIO.read(Objects.requireNonNull(inputStream));
-				Validate.validState(image.getHeight() == image.getWidth(), "Must be square icon");
+				if (image.getHeight() != image.getWidth())
+					throw new IllegalStateException("Must be square icon");
 				this.list.cacheModIcon(path, image);
 				return image;
 			}

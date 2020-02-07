@@ -7,10 +7,10 @@ import net.fabricmc.loader.api.SemanticVersion;
 import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.metadata.*;
 import net.fabricmc.loader.util.version.VersionParsingException;
-import org.apache.commons.lang3.RandomStringUtils;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TestModContainer implements ModContainer {
 
@@ -40,6 +40,34 @@ public class TestModContainer implements ModContainer {
 		return this.rootPath;
 	}
 
+	private static String randomAlphabetic(int minLen, int maxLen) {
+		int len = ThreadLocalRandom.current().nextInt(maxLen - minLen + 1) + minLen;
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < len; i++) {
+			int rand = ThreadLocalRandom.current().nextInt(26 * 2);
+			if (rand < 26)
+				sb.append((char) ('A' + rand));
+			else
+				sb.append((char) ('a' - 26 + rand));
+		}
+		return sb.toString();
+	}
+
+	private static String randomAlphanumeric(int minLen, int maxLen) {
+		int len = ThreadLocalRandom.current().nextInt(maxLen - minLen + 1) + minLen;
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < len; i++) {
+			int rand = ThreadLocalRandom.current().nextInt(26 * 2 + 10);
+			if (rand < 26)
+				sb.append((char) ('A' + rand));
+			else if (rand < 26 * 2)
+				sb.append((char) ('a' - 26 + rand));
+			else
+				sb.append((char) ('0' - (26 * 2) + rand));
+		}
+		return sb.toString();
+	}
+
 	public static class TestModMetadata implements ModMetadata {
 		private final String id;
 		private final String description;
@@ -47,10 +75,10 @@ public class TestModContainer implements ModContainer {
 
 		public TestModMetadata() {
 			super();
-			this.id = RandomStringUtils.randomAlphabetic(10, 50).toLowerCase(Locale.ROOT);
-			this.description = RandomStringUtils.randomAlphabetic(500);
+			this.id = randomAlphabetic(10, 50).toLowerCase(Locale.ROOT);
+			this.description = randomAlphabetic(0, 500);
 			try {
-				this.version = SemanticVersion.parse(String.format("%d.%d.%d+%s", RAND.nextInt(10), RAND.nextInt(50), RAND.nextInt(200), RandomStringUtils.randomAlphanumeric(2, 10)));
+				this.version = SemanticVersion.parse(String.format("%d.%d.%d+%s", RAND.nextInt(10), RAND.nextInt(50), RAND.nextInt(200), randomAlphanumeric(2, 10)));
 			} catch (VersionParsingException e) {
 				throw new AssertionError("Generated version is not semantic", e);
 			}

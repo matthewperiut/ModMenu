@@ -4,7 +4,6 @@ import io.github.prospector.modmenu.ModMenu;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,15 +71,28 @@ public class HardcodedUtil {
 		if (matcher.matches() || name.equals("fabric-renderer-indigo") || name.equals("fabric-api-base")) {
 			if (matcher.matches()) {
 				String v = matcher.group(1);
-				name = WordUtils.capitalize(name.replace(v, "").replace("-", " "));
+				name = capitalize(name.replace(v, "").replace("-", " "));
 				name = name + " (" + v.replace("-", "") + ")";
 			} else {
-				name = WordUtils.capitalize(name.replace("-", " "));
+				name = capitalize(name.replace("-", " "));
 			}
 			name = name.replace("Api", "API");
 			name = name.replace("Blockentity", "BlockEntity");
 		}
 		return name;
+	}
+
+	private static String capitalize(String str) {
+		StringBuilder sb = new StringBuilder();
+		boolean capitalizeNext = true;
+		for (int i = 0; i < str.length(); i++) {
+			char c = str.charAt(i);
+			if (capitalizeNext)
+				c = Character.toTitleCase(c);
+			capitalizeNext = Character.isWhitespace(c);
+			sb.append(c);
+		}
+		return sb.toString();
 	}
 
 	public static String getHardcodedDescription(String id) {

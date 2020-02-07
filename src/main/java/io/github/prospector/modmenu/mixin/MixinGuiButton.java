@@ -8,6 +8,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface MixinGuiButton {
 
 	@Accessor
+	int getWidth();
+
+	@Accessor
 	void setWidth(int width);
 
 	@Accessor
