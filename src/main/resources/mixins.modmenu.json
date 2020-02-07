@@ -3,12 +3,11 @@
   "package": "io.github.prospector.modmenu.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
-    "MixinEntryListWidgetEntries",
     "MixinGameMenuScreen",
     "MixinTitleScreen",
     "MixinTexturePacks",
 
-    "GuiButtonAccessor",
+    "MixinGuiButton",
     "MinecraftAccessor"
   ],
   "injectors": {

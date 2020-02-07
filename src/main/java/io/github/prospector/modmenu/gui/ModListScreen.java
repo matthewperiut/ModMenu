@@ -5,7 +5,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
-import io.github.prospector.modmenu.mixin.GuiButtonAccessor;
 import io.github.prospector.modmenu.util.BadgeRenderer;
 import io.github.prospector.modmenu.util.HardcodedUtil;
 import io.github.prospector.modmenu.util.RenderUtils;
