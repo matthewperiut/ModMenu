@@ -1,6 +1,5 @@
 package io.github.prospector.modmenu.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.util.BadgeRenderer;
 import io.github.prospector.modmenu.util.HardcodedUtil;
@@ -8,68 +7,78 @@ import io.github.prospector.modmenu.util.RenderUtils;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.src.FontRenderer;
+import net.minecraft.src.Tessellator;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.GL11;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
 public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEntry> {
-	public static final Identifier UNKNOWN_ICON = new Identifier("textures/misc/unknown_pack.png");
+	public static final String UNKNOWN_ICON = "/gui/unknown_pack.png";
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	protected final MinecraftClient client;
+	protected final Minecraft client;
 	protected final ModContainer container;
 	protected final ModMetadata metadata;
 	protected final ModListWidget list;
-	protected Identifier iconLocation;
+	protected Integer iconLocation;
 
-	public ModListEntry(ModContainer container, ModListWidget list) {
+	public ModListEntry(Minecraft mc, ModContainer container, ModListWidget list) {
 		this.container = container;
 		this.list = list;
 		this.metadata = container.getMetadata();
-		this.client = MinecraftClient.getInstance();
+		this.client = mc;
 	}
 
 	@Override
 	public void render(int index, int y, int x, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
 		x += getXOffset();
 		rowWidth -= getXOffset();
-		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+		GL11.glColor4f(1f, 1f, 1f, 1f);
 		this.bindIconTexture();
-		RenderSystem.enableBlend();
-		DrawableHelper.blit(x, y, 0.0F, 0.0F, 32, 32, 32, 32);
-		RenderSystem.disableBlend();
+		GL11.glEnable(GL11.GL_BLEND);
+		Tessellator tess = Tessellator.instance;
+		tess.startDrawingQuads();
+		tess.addVertexWithUV(x, y, 0, 0, 0);
+		tess.addVertexWithUV(x, y + 32, 0, 0, 1);
+		tess.addVertexWithUV(x + 32, y + 32, 0, 1, 1);
+		tess.addVertexWithUV(x + 32, y, 0, 1, 0);
+		tess.draw();
+		GL11.glDisable(GL11.GL_BLEND);
 		String name = HardcodedUtil.formatFabricModuleName(metadata.getName());
 		String trimmedName = name;
 		int maxNameWidth = rowWidth - 32 - 3;
-		TextRenderer font = this.client.textRenderer;
+		FontRenderer font = this.client.field_6314_o;
 		if (font.getStringWidth(name) > maxNameWidth) {
-			trimmedName = font.trimToWidth(name, maxNameWidth - font.getStringWidth("...")) + "...";
+			int maxWidth = maxNameWidth - font.getStringWidth("...");
+			trimmedName = "";
+			while (font.getStringWidth(trimmedName) < maxWidth && trimmedName.length() < name.length()) {
+				trimmedName += name.charAt(trimmedName.length());
+			}
+			trimmedName = trimmedName.isEmpty() ? "..." : trimmedName.substring(0, trimmedName.length() - 1) + "...";
 		}
-		font.draw(trimmedName, x + 32 + 3, y + 1, 0xFFFFFF);
-		new BadgeRenderer(x + 32 + 3 + font.getStringWidth(name) + 2, y, x + rowWidth, container, list.getParent()).draw(mouseX, mouseY);
+		font.drawString(trimmedName, x + 32 + 3, y + 1, 0xFFFFFF);
+		new BadgeRenderer(client, x + 32 + 3 + font.getStringWidth(name) + 2, y, x + rowWidth, container, list.getParent()).draw(mouseX, mouseY);
 		String description = metadata.getDescription();
 		if (description.isEmpty() && HardcodedUtil.getHardcodedDescriptions().containsKey(metadata.getId())) {
 			description = HardcodedUtil.getHardcodedDescription(metadata.getId());
 		}
-		RenderUtils.drawWrappedString(description, (x + 32 + 3 + 4), (y + client.textRenderer.fontHeight + 2), rowWidth - 32 - 7, 2, 0x808080);
+		RenderUtils.INSTANCE.drawWrappedString(font, description, (x + 32 + 3 + 4), (y + 9 + 2), rowWidth - 32 - 7, 2, 0x808080);
 	}
 
-	private NativeImageBackedTexture createIcon() {
+	private BufferedImage createIcon() {
 		try {
-			Path path = container.getPath(metadata.getIconPath(64 * MinecraftClient.getInstance().options.guiScale).orElse("assets/" + metadata.getId() + "/icon.png"));
-			NativeImageBackedTexture cached = this.list.getCachedModIcon(path);
+			Path path = container.getPath(metadata.getIconPath(0).orElse("assets/" + metadata.getId() + "/icon.png"));
+			BufferedImage cached = this.list.getCachedModIcon(path);
 			if (cached != null) {
 				return cached;
 			}
@@ -88,11 +97,10 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 				return cached;
 			}
 			try (InputStream inputStream = Files.newInputStream(path)) {
-				NativeImage image = NativeImage.read(Objects.requireNonNull(inputStream));
+				BufferedImage image = ImageIO.read(Objects.requireNonNull(inputStream));
 				Validate.validState(image.getHeight() == image.getWidth(), "Must be square icon");
-				NativeImageBackedTexture tex = new NativeImageBackedTexture(image);
-				this.list.cacheModIcon(path, tex);
-				return tex;
+				this.list.cacheModIcon(path, image);
+				return image;
 			}
 
 		} catch (Throwable t) {
@@ -113,15 +121,20 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 
 	public void bindIconTexture() {
 		if (this.iconLocation == null) {
-			this.iconLocation = new Identifier("modmenu", metadata.getId() + "_icon");
-			NativeImageBackedTexture icon = this.createIcon();
+			BufferedImage icon = this.createIcon();
 			if (icon != null) {
-				this.client.getTextureManager().registerTexture(this.iconLocation, icon);
+				this.iconLocation = this.client.field_6315_n.func_1074_a(icon);
 			} else {
-				this.iconLocation = UNKNOWN_ICON;
+				this.iconLocation = this.client.field_6315_n.getTexture(UNKNOWN_ICON);
 			}
 		}
-		this.client.getTextureManager().bindTexture(this.iconLocation);
+		this.client.field_6315_n.bindTexture(this.iconLocation);
+	}
+
+	public void deleteTexture() {
+		if (iconLocation != null) {
+			this.client.field_6315_n.func_1078_a(iconLocation);
+		}
 	}
 
 	public int getXOffset() {

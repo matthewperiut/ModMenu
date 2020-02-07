@@ -28,23 +28,23 @@ public class ModMenuConfig {
 	}
 
 	public static enum Sorting {
-		ASCENDING(Comparator.comparing(modContainer -> HardcodedUtil.formatFabricModuleName(modContainer.getMetadata().getName())), "modmenu.sorting.ascending"),
-		DECENDING(ASCENDING.getComparator().reversed(), "modmenu.sorting.decending");
+		ASCENDING(Comparator.comparing(modContainer -> HardcodedUtil.formatFabricModuleName(modContainer.getMetadata().getName())), "A-Z"),
+		DECENDING(ASCENDING.getComparator().reversed(), "Z-A");
 
 		Comparator<ModContainer> comparator;
-		String translationKey;
+		String name;
 
-		Sorting(Comparator<ModContainer> comparator, String translationKey) {
+		Sorting(Comparator<ModContainer> comparator, String name) {
 			this.comparator = comparator;
-			this.translationKey = translationKey;
+			this.name = name;
 		}
 
 		public Comparator<ModContainer> getComparator() {
 			return comparator;
 		}
 
-		public String getTranslationKey() {
-			return translationKey;
+		public String getName() {
+			return name;
 		}
 	}
 }

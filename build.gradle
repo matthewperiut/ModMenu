@@ -1,11 +1,29 @@
+buildscript {
+	repositories {
+		jcenter()
+		maven {
+			name = 'Fabric'
+			url = 'https://maven.fabricmc.net/'
+		}
+		maven {
+			name = 'Forge'
+			url = 'https://files.minecraftforge.net/maven/'
+		}
+		maven {
+			name = 'Jitpack'
+			url = 'https://jitpack.io/'
+		}
+	}
+	dependencies {
+		classpath 'com.github.Earthcomputer:fabric-loom:7b42eb7b'
+	}
+}
+
 plugins {
-	id 'java'
 	id 'maven-publish'
-	id 'idea'
-	id 'eclipse'
-	id 'fabric-loom' version '0.2.6-SNAPSHOT'
 	id 'com.matthewprenger.cursegradle' version "1.1.2"
 }
+apply plugin: 'fabric-loom'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -17,11 +35,26 @@ group = project.maven_group
 def ENV = System.getenv()
 version = version + "+" + (ENV.BUILD_NUMBER ? ("build." + ENV.BUILD_NUMBER) : "custom")
 
+repositories {
+	maven {
+		name = 'Jitpack'
+		url = 'https://jitpack.io/'
+	}
+}
+
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
-	modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	mappings loom.alphaMcp('2.2a.1', loom.mediafire('http://www.mediafire.com/file/vwgj80p8n1plrlq/mcp22a.zip')) { mappings ->
+		mappings.method 'net/minecraft/src/World', '(III)Z', 'func_708_k', 'canSeeTheSky'
+	}
+	modCompile "com.github.Earthcomputer:fabric-loader:${project.loader_version}"
+
+	compile 'com.google.code.gson:gson:2.8.6'
+	compile 'com.google.guava:guava:28.2-jre'
+	compile 'commons-io:commons-io:2.5'
+	compile 'org.apache.commons:commons-lang3:3.9'
+	compile 'org.apache.logging.log4j:log4j-api:2.13.0'
+	compile 'org.apache.logging.log4j:log4j-core:2.13.0'
 }
 
 minecraft {
@@ -51,6 +84,10 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 
 jar {
 	from "LICENSE"
+}
+
+remapJar {
+	toMappings = 'official'
 }
 
 publishing {

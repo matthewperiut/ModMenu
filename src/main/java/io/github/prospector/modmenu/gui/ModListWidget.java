@@ -1,29 +1,23 @@
 package io.github.prospector.modmenu.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.config.ModMenuConfigManager;
 import io.github.prospector.modmenu.gui.entries.ChildEntry;
 import io.github.prospector.modmenu.gui.entries.IndependentEntry;
 import io.github.prospector.modmenu.gui.entries.ParentEntry;
-import io.github.prospector.modmenu.util.HardcodedUtil;
 import io.github.prospector.modmenu.util.ModListSearch;
 import io.github.prospector.modmenu.util.TestModContainer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.widget.AlwaysSelectedEntryListWidget;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.util.NarratorManager;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.src.MathHelper;
+import net.minecraft.src.Tessellator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.GL11;
 
+import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -31,14 +25,15 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 	private static final Logger LOGGER = LogManager.getLogger();
 	public static final boolean DEBUG = Boolean.getBoolean("modmenu.debug");
 
-	private final Map<Path, NativeImageBackedTexture> modIconsCache = new HashMap<>();
+	private final Map<Path, BufferedImage> modIconsCache = new HashMap<>();
 	private final ModListScreen parent;
 	private List<ModContainer> modContainerList = null;
 	private Set<ModContainer> addedMods = new HashSet<>();
 	private String selectedModId = null;
 	private boolean scrolling;
+	private boolean isFocused;
 
-	public ModListWidget(MinecraftClient client, int width, int height, int y1, int y2, int entryHeight, String searchTerm, ModListWidget list, ModListScreen parent) {
+	public ModListWidget(Minecraft client, int width, int height, int y1, int y2, int entryHeight, String searchTerm, ModListWidget list, ModListScreen parent) {
 		super(client, width, height, y1, y2, entryHeight);
 		this.parent = parent;
 		if (list != null) {
@@ -61,15 +56,11 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 
 	@Override
 	protected boolean isFocused() {
-		return parent.getFocused() == this;
+		return isFocused;
 	}
 
 	public void select(ModListEntry entry) {
 		this.setSelected(entry);
-		if (entry != null) {
-			ModMetadata metadata = entry.getMetadata();
-			NarratorManager.INSTANCE.narrate(new TranslatableText("narrator.select", HardcodedUtil.formatFabricModuleName(metadata.getName())).getString());
-		}
 	}
 
 	@Override
@@ -153,18 +144,18 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 					//Add parent mods when not searching
 					List<ModContainer> children = ModMenu.PARENT_MAP.get(container);
 					children.sort(ModMenuConfigManager.getConfig().getSorting().getComparator());
-					ParentEntry parent = new ParentEntry(container, children, this);
+					ParentEntry parent = new ParentEntry(minecraft, container, children, this);
 					this.addEntry(parent);
 					//Add children if they are meant to be shown
 					if (this.parent.showModChildren.contains(modId)) {
 						List<ModContainer> validChildren = ModListSearch.search(this.parent, searchTerm, children);
 						for (ModContainer child : validChildren) {
-							this.addEntry(new ChildEntry(child, parent, this, validChildren.indexOf(child) == validChildren.size() - 1));
+							this.addEntry(new ChildEntry(minecraft, child, parent, this, validChildren.indexOf(child) == validChildren.size() - 1));
 						}
 					}
 				} else {
 					//A mod with no children
-					this.addEntry(new IndependentEntry(container, this));
+					this.addEntry(new IndependentEntry(minecraft, container, this));
 				}
 			}
 		}
@@ -190,8 +181,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 	@Override
 	protected void renderList(int x, int y, int mouseX, int mouseY, float delta) {
 		int itemCount = this.getItemCount();
-		Tessellator tessellator_1 = Tessellator.getInstance();
-		BufferBuilder buffer = tessellator_1.getBuffer();
+		Tessellator tessellator_1 = Tessellator.instance;
 
 		for (int index = 0; index < itemCount; ++index) {
 			int entryTop = this.getRowTop(index) + 2;
@@ -204,23 +194,23 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 				if (this.renderSelection && this.isSelectedItem(index)) {
 					entryLeft = getRowLeft() - 2 + entry.getXOffset();
 					int selectionRight = x + rowWidth + 2;
-					RenderSystem.disableTexture();
+					GL11.glDisable(GL11.GL_TEXTURE_2D);
 					float float_2 = this.isFocused() ? 1.0F : 0.5F;
-					RenderSystem.color4f(float_2, float_2, float_2, 1.0F);
-					buffer.begin(7, VertexFormats.POSITION);
-					buffer.vertex((double) entryLeft, (double) (entryTop + entryHeight + 2), 0.0D).next();
-					buffer.vertex((double) selectionRight, (double) (entryTop + entryHeight + 2), 0.0D).next();
-					buffer.vertex((double) selectionRight, (double) (entryTop - 2), 0.0D).next();
-					buffer.vertex((double) entryLeft, (double) (entryTop - 2), 0.0D).next();
+					GL11.glColor4f(float_2, float_2, float_2, 1f);
+					tessellator_1.startDrawingQuads();
+					tessellator_1.addVertex((double) entryLeft, (double) (entryTop + entryHeight + 2), 0.0D);
+					tessellator_1.addVertex((double) selectionRight, (double) (entryTop + entryHeight + 2), 0.0D);
+					tessellator_1.addVertex((double) selectionRight, (double) (entryTop - 2), 0.0D);
+					tessellator_1.addVertex((double) entryLeft, (double) (entryTop - 2), 0.0D);
 					tessellator_1.draw();
-					RenderSystem.color4f(0.0F, 0.0F, 0.0F, 1.0F);
-					buffer.begin(7, VertexFormats.POSITION);
-					buffer.vertex((double) (entryLeft + 1), (double) (entryTop + entryHeight + 1), 0.0D).next();
-					buffer.vertex((double) (selectionRight - 1), (double) (entryTop + entryHeight + 1), 0.0D).next();
-					buffer.vertex((double) (selectionRight - 1), (double) (entryTop - 1), 0.0D).next();
-					buffer.vertex((double) (entryLeft + 1), (double) (entryTop - 1), 0.0D).next();
+					GL11.glColor4f(0f, 0f, 0f, 1f);
+					tessellator_1.startDrawingQuads();
+					tessellator_1.addVertex((double) (entryLeft + 1), (double) (entryTop + entryHeight + 1), 0.0D);
+					tessellator_1.addVertex((double) (selectionRight - 1), (double) (entryTop + entryHeight + 1), 0.0D);
+					tessellator_1.addVertex((double) (selectionRight - 1), (double) (entryTop - 1), 0.0D);
+					tessellator_1.addVertex((double) (entryLeft + 1), (double) (entryTop - 1), 0.0D);
 					tessellator_1.draw();
-					RenderSystem.enableTexture();
+					GL11.glEnable(GL11.GL_TEXTURE_2D);
 				}
 
 				entryLeft = this.getRowLeft();
@@ -259,7 +249,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 	}
 
 	public final ModListEntry getEntryAtPos(double x, double y) {
-		int int_5 = MathHelper.floor(y - (double) this.top) - this.headerHeight + (int) this.getScrollAmount() - 4;
+		int int_5 = MathHelper.convertToBlockCoord(y - (double) this.top) - this.headerHeight + (int) this.getScrollAmount() - 4;
 		int index = int_5 / this.itemHeight;
 		return x < (double) this.getScrollbarPosition() && x >= (double) getRowLeft() && x <= (double) (getRowLeft() + getRowWidth()) && index >= 0 && int_5 >= 0 && index < this.getItemCount() ? this.children().get(index) : null;
 	}
@@ -302,16 +292,14 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 
 	@Override
 	public void close() {
-		for (NativeImageBackedTexture tex : this.modIconsCache.values()) {
-			tex.close();
-		}
+		this.children().forEach(ModListEntry::deleteTexture);
 	}
 
-	NativeImageBackedTexture getCachedModIcon(Path path) {
+	BufferedImage getCachedModIcon(Path path) {
 		return this.modIconsCache.get(path);
 	}
 
-	void cacheModIcon(Path path, NativeImageBackedTexture tex) {
+	void cacheModIcon(Path path, BufferedImage tex) {
 		this.modIconsCache.put(path, tex);
 	}
 

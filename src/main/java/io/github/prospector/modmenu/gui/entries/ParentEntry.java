@@ -1,28 +1,28 @@
 package io.github.prospector.modmenu.gui.entries;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.gui.ModListEntry;
 import io.github.prospector.modmenu.gui.ModListWidget;
 import io.github.prospector.modmenu.util.ModListSearch;
 import net.fabricmc.loader.api.ModContainer;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.util.Identifier;
-import org.lwjgl.glfw.GLFW;
+import net.minecraft.client.Minecraft;
+import net.minecraft.src.FontRenderer;
+import net.minecraft.src.Tessellator;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class ParentEntry extends ModListEntry {
-	private static final Identifier PARENT_MOD_TEXTURE = new Identifier(ModMenu.MOD_ID, "textures/gui/parent_mod.png");
+	private static final String PARENT_MOD_TEXTURE = "/assets/" + ModMenu.MOD_ID + "/textures/gui/parent_mod.png";
 	protected List<ModContainer> children;
 	protected ModListWidget list;
 	protected boolean hoveringIcon = false;
 
-	public ParentEntry(ModContainer parent, List<ModContainer> children, ModListWidget list) {
-		super(parent, list);
+	public ParentEntry(Minecraft mc, ModContainer parent, List<ModContainer> children, ModListWidget list) {
+		super(mc, parent, list);
 		this.children = children;
 		this.list = list;
 	}
@@ -30,9 +30,9 @@ public class ParentEntry extends ModListEntry {
 	@Override
 	public void render(int index, int y, int x, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
 		super.render(index, y, x, rowWidth, rowHeight, mouseX, mouseY, isSelected, delta);
-		TextRenderer font = client.textRenderer;
-		int childrenBadgeHeight = font.fontHeight;
-		int childrenBadgeWidth = font.fontHeight;
+		FontRenderer font = client.field_6314_o;
+		int childrenBadgeHeight = 9;
+		int childrenBadgeWidth = 9;
 		int children = ModListSearch.search(list.getParent(), list.getParent().getSearchInput(), getChildren()).size();
 		int childrenWidth = font.getStringWidth(Integer.toString(children)) - 1;
 		if (childrenBadgeWidth < childrenWidth + 4) {
@@ -42,20 +42,26 @@ public class ParentEntry extends ModListEntry {
 		int childrenBadgeY = y + 32 - childrenBadgeHeight;
 		int childrenOutlineColor = 0x8810d098;
 		int childrenFillColor = 0x88046146;
-		DrawableHelper.fill(childrenBadgeX + 1, childrenBadgeY, childrenBadgeX + childrenBadgeWidth - 1, childrenBadgeY + 1, childrenOutlineColor);
-		DrawableHelper.fill(childrenBadgeX, childrenBadgeY + 1, childrenBadgeX + 1, childrenBadgeY + childrenBadgeHeight - 1, childrenOutlineColor);
-		DrawableHelper.fill(childrenBadgeX + childrenBadgeWidth - 1, childrenBadgeY + 1, childrenBadgeX + childrenBadgeWidth, childrenBadgeY + childrenBadgeHeight - 1, childrenOutlineColor);
-		DrawableHelper.fill(childrenBadgeX + 1, childrenBadgeY + 1, childrenBadgeX + childrenBadgeWidth - 1, childrenBadgeY + childrenBadgeHeight - 1, childrenFillColor);
-		DrawableHelper.fill(childrenBadgeX + 1, childrenBadgeY + childrenBadgeHeight - 1, childrenBadgeX + childrenBadgeWidth - 1, childrenBadgeY + childrenBadgeHeight, childrenOutlineColor);
-		font.draw(Integer.toString(children), childrenBadgeX + childrenBadgeWidth / 2 - childrenWidth / 2, childrenBadgeY + 1, 0xCACACA);
+		drawRect(childrenBadgeX + 1, childrenBadgeY, childrenBadgeX + childrenBadgeWidth - 1, childrenBadgeY + 1, childrenOutlineColor);
+		drawRect(childrenBadgeX, childrenBadgeY + 1, childrenBadgeX + 1, childrenBadgeY + childrenBadgeHeight - 1, childrenOutlineColor);
+		drawRect(childrenBadgeX + childrenBadgeWidth - 1, childrenBadgeY + 1, childrenBadgeX + childrenBadgeWidth, childrenBadgeY + childrenBadgeHeight - 1, childrenOutlineColor);
+		drawRect(childrenBadgeX + 1, childrenBadgeY + 1, childrenBadgeX + childrenBadgeWidth - 1, childrenBadgeY + childrenBadgeHeight - 1, childrenFillColor);
+		drawRect(childrenBadgeX + 1, childrenBadgeY + childrenBadgeHeight - 1, childrenBadgeX + childrenBadgeWidth - 1, childrenBadgeY + childrenBadgeHeight, childrenOutlineColor);
+		font.drawString(Integer.toString(children), childrenBadgeX + childrenBadgeWidth / 2 - childrenWidth / 2, childrenBadgeY + 1, 0xCACACA);
 		this.hoveringIcon = mouseX >= x - 1 && mouseX <= x - 1 + 32 && mouseY >= y - 1 && mouseY <= y - 1 + 32;
 		if (isMouseOver(mouseX, mouseY)) {
-			DrawableHelper.fill(x, y, x + 32, y + 32, 0xA0909090);
-			this.client.getTextureManager().bindTexture(PARENT_MOD_TEXTURE);
+			drawRect(x, y, x + 32, y + 32, 0xA0909090);
+			this.client.field_6315_n.bindTexture(this.client.field_6315_n.getTexture(PARENT_MOD_TEXTURE));
 			int xOffset = list.getParent().showModChildren.contains(getMetadata().getId()) ? 32 : 0;
 			int yOffset = hoveringIcon ? 32 : 0;
-			RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-			DrawableHelper.blit(x, y, xOffset, yOffset, 32 + xOffset, 32 + yOffset, 256, 256);
+			GL11.glColor4f(1f, 1f, 1f, 1f);
+			Tessellator tess = Tessellator.instance;
+			tess.startDrawingQuads();
+			tess.addVertexWithUV(x, y, 0, xOffset / 256f, yOffset / 256f);
+			tess.addVertexWithUV(x, y + 32, 0, xOffset / 256f, (yOffset + 32) / 256f);
+			tess.addVertexWithUV(x + 32, y + 32, 0, (xOffset + 32) / 256f, (yOffset + 32) / 256f);
+			tess.addVertexWithUV(x + 32, y, 0, (xOffset + 32) / 256f, yOffset / 256f);
+			tess.draw();
 		}
 	}
 
@@ -75,7 +81,7 @@ public class ParentEntry extends ModListEntry {
 
 	@Override
 	public boolean keyPressed(int int_1, int int_2, int int_3) {
-		if (int_1 == GLFW.GLFW_KEY_ENTER) {
+		if (int_1 == Keyboard.KEY_RETURN) {
 			String id = getMetadata().getId();
 			if (list.getParent().showModChildren.contains(id)) {
 				list.getParent().showModChildren.remove(id);

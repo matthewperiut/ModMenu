@@ -5,7 +5,11 @@
   "client": [
     "MixinEntryListWidgetEntries",
     "MixinGameMenuScreen",
-    "MixinTitleScreen"
+    "MixinTitleScreen",
+    "MixinTexturePacks",
+
+    "GuiButtonAccessor",
+    "MinecraftAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

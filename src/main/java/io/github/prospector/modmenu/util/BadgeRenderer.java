@@ -4,8 +4,7 @@ import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.gui.ModListScreen;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.Minecraft;
 
 import java.util.Calendar;
 
@@ -13,33 +12,33 @@ public class BadgeRenderer {
 	protected int startX, startY, badgeX, badgeY, badgeMax;
 	protected ModContainer container;
 	protected ModMetadata metadata;
-	protected MinecraftClient client;
+	protected Minecraft client;
 	protected final ModListScreen screen;
 
-	public BadgeRenderer(int startX, int startY, int endX, ModContainer container, ModListScreen screen) {
+	public BadgeRenderer(Minecraft client, int startX, int startY, int endX, ModContainer container, ModListScreen screen) {
 		this.startX = startX;
 		this.startY = startY;
 		this.badgeMax = endX;
 		this.container = container;
 		this.metadata = container.getMetadata();
 		this.screen = screen;
-		this.client = MinecraftClient.getInstance();
+		this.client = client;
 	}
 
 	public void draw(int mouseX, int mouseY) {
 		this.badgeX = startX;
 		this.badgeY = startY;
 		if (ModMenu.LIBRARY_MODS.contains(metadata.getId())) {
-			drawBadge(I18n.translate("modmenu.library"), 0x8810d098, 0x88046146, mouseX, mouseY);
+			drawBadge("Library", 0x8810d098, 0x88046146, mouseX, mouseY);
 		}
 		if (ModMenu.CLIENTSIDE_MODS.contains(metadata.getId())) {
-			drawBadge(I18n.translate("modmenu.clientsideOnly"), 0x884383E3, 0x880E4699, mouseX, mouseY);
+			drawBadge("Client", 0x884383E3, 0x880E4699, mouseX, mouseY);
 		}
 		if (ModMenu.PATCHWORK_FORGE_MODS.contains(metadata.getId())) {
-			drawBadge(I18n.translate("modmenu.forge"), 0x887C89A3, 0x88202C43, mouseX, mouseY);
+			drawBadge("Forge", 0x887C89A3, 0x88202C43, mouseX, mouseY);
 		}
 		if (metadata.getId().equals("minecraft")) {
-			drawBadge(I18n.translate("modmenu.minecraft"), 0x88BCBCBC, 0x88535353, mouseX, mouseY);
+			drawBadge("Minecraft", 0x88BCBCBC, 0x88535353, mouseX, mouseY);
 		}
 		//noinspection MagicConstant
 		if (Calendar.getInstance().get(0b10) == 0b11 && Calendar.getInstance().get(0b101) == 0x1) {
@@ -54,9 +53,9 @@ public class BadgeRenderer {
 	}
 
 	public void drawBadge(String text, int outlineColor, int fillColor, int mouseX, int mouseY) {
-		int width = client.textRenderer.getStringWidth(text) + 6;
+		int width = client.field_6314_o.getStringWidth(text) + 6;
 		if (badgeX + width < badgeMax) {
-			RenderUtils.drawBadge(badgeX, badgeY, width, text, outlineColor, fillColor, 0xCACACA);
+			RenderUtils.INSTANCE.drawBadge(client.field_6314_o, badgeX, badgeY, width, text, outlineColor, fillColor, 0xCACACA);
 			badgeX += width + 3;
 		}
 	}

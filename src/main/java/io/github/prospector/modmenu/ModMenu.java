@@ -13,7 +13,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.CustomValue;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.src.GuiScreen;
 
 import java.text.NumberFormat;
 import java.util.*;
@@ -28,15 +28,15 @@ public class ModMenu implements ClientModInitializer {
 	public static final Set<String> CLIENTSIDE_MODS = new HashSet<>();
 	public static final Set<String> PATCHWORK_FORGE_MODS = new HashSet<>();
 	public static final LinkedListMultimap<ModContainer, ModContainer> PARENT_MAP = LinkedListMultimap.create();
-	private static ImmutableMap<String, Function<Screen, ? extends Screen>> configScreenFactories = ImmutableMap.of();
+	private static ImmutableMap<String, Function<GuiScreen, ? extends GuiScreen>> configScreenFactories = ImmutableMap.of();
 	private static int libraryCount = 0;
 
 	public static boolean hasConfigScreenFactory(String modid) {
 		return configScreenFactories.containsKey(modid);
 	}
 
-	public static Screen getConfigScreen(String modid, Screen menuScreen) {
-		Function<Screen, ? extends Screen> factory = configScreenFactories.get(modid);
+	public static GuiScreen getConfigScreen(String modid, GuiScreen menuScreen) {
+		Function<GuiScreen, ? extends GuiScreen> factory = configScreenFactories.get(modid);
 		return factory != null ? factory.apply(menuScreen) : null;
 	}
 
@@ -62,7 +62,7 @@ public class ModMenu implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		ModMenuConfigManager.initializeConfig();
-		ImmutableMap.Builder<String, Function<Screen, ? extends Screen>> factories = ImmutableMap.builder();
+		ImmutableMap.Builder<String, Function<GuiScreen, ? extends GuiScreen>> factories = ImmutableMap.builder();
 		FabricLoader.getInstance().getEntrypoints("modmenu", ModMenuApi.class).forEach(api -> factories.put(api.getModId(), api.getConfigScreenFactory()));
 		configScreenFactories = factories.build();
 		Collection<ModContainer> mods = FabricLoader.getInstance().getAllMods();
