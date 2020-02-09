@@ -247,6 +247,7 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 		GL11.glShadeModel(GL11.GL_FLAT);
 		GL11.glEnable(GL11.GL_ALPHA_TEST);
 		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 	}
 
 	protected void centerScrollOn(E entry) {
