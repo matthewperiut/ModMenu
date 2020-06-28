@@ -1,12 +1,8 @@
 package io.github.prospector.modmenu.util;
 
 import com.google.gson.JsonElement;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.SemanticVersion;
-import net.fabricmc.loader.api.Version;
+import net.fabricmc.loader.api.*;
 import net.fabricmc.loader.api.metadata.*;
-import net.fabricmc.loader.util.version.VersionParsingException;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -157,16 +153,6 @@ public class TestModContainer implements ModContainer {
 		@Override
 		public Optional<String> getIconPath(int size) {
 			return Optional.empty();
-		}
-
-		@Override
-		public boolean containsCustomElement(String key) {
-			return false;
-		}
-
-		@Override
-		public JsonElement getCustomElement(String key) {
-			return null;
 		}
 
 		@Override

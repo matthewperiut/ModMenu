@@ -1,7 +1,10 @@
 package io.github.prospector.modmenu.gui;
 
 import io.github.prospector.modmenu.mixin.MinecraftAccessor;
-import net.minecraft.src.*;
+import net.minecraft.client.OperatingSystem;
+import net.minecraft.client.gui.Screen;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.TextRenderer;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
@@ -9,8 +12,8 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.util.function.Predicate;
 
-public class TextFieldWidget extends Gui {
-	private final FontRenderer font;
+public class TextFieldWidget extends Screen {
+	private final TextRenderer font;
 	public int x;
 	public int y;
 	/**
@@ -57,7 +60,7 @@ public class TextFieldWidget extends Gui {
 	 */
 	private Predicate<String> validator = s -> true;
 
-	public TextFieldWidget(FontRenderer font, int x, int y, int width, int height) {
+	public TextFieldWidget(TextRenderer font, int x, int y, int width, int height) {
 		this.font = font;
 		this.x = x;
 		this.y = y;
@@ -299,7 +302,7 @@ public class TextFieldWidget extends Gui {
 			return true;
 		} else if (isKeyComboCtrlV(keyCode)) {
 			if (isEnabled) {
-				writeText(GuiScreen.getClipboardString());
+				writeText(Screen.getClipboardContents());
 			}
 
 			return true;
@@ -401,7 +404,7 @@ public class TextFieldWidget extends Gui {
 	/**
 	 * Called when mouse is clicked, regardless as to whether it is over this button or not.
 	 */
-	public boolean mouseClicked(int mouseX, int mouseY, int mouseButton) {
+	public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
 		boolean flag = mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
 
 		if (canLoseFocus) {
@@ -417,9 +420,9 @@ public class TextFieldWidget extends Gui {
 
 			String s = trimStringToWidth(font, text.substring(lineScrollOffset), getWidth());
 			setCursorPosition(trimStringToWidth(font, s, i).length() + lineScrollOffset);
-			return true;
+			//return true;
 		} else {
-			return false;
+			//return false;
 		}
 	}
 
@@ -429,8 +432,8 @@ public class TextFieldWidget extends Gui {
 	public void drawTextBox() {
 		if (getVisible()) {
 			if (getEnableBackgroundDrawing()) {
-				drawRect(x - 1, y - 1, x + width + 1, y + height + 1, 0xffa0a0a0);
-				drawRect(x, y, x + width, y + height, 0xff000000);
+				fill(x - 1, y - 1, x + width + 1, y + height + 1, 0xffa0a0a0);
+				fill(x, y, x + width, y + height, 0xff000000);
 			}
 
 			int i = isEnabled ? enabledColor : disabledColor;
@@ -449,8 +452,8 @@ public class TextFieldWidget extends Gui {
 
 			if (!s.isEmpty()) {
 				String s1 = flag ? s.substring(0, j) : s;
-				font.drawStringWithShadow(s1, l, i1, i);
-				j1 += font.getStringWidth(s1) + 1;
+				font.drawTextWithShadow(s1, l, i1, i);
+				j1 += font.getTextWidth(s1) + 1;
 			}
 
 			boolean flag2 = cursorPosition < text.length() || text.length() >= getMaxStringLength();
@@ -464,20 +467,20 @@ public class TextFieldWidget extends Gui {
 			}
 
 			if (!s.isEmpty() && flag && j < s.length()) {
-				font.drawStringWithShadow(s.substring(j), j1, i1, i);
+				font.drawTextWithShadow(s.substring(j), j1, i1, i);
 				//j1 += this.font.getStringWidth(s.substring(j));
 			}
 
 			if (flag1) {
 				if (flag2) {
-					drawRect(k1, i1 - 1, k1 + 1, i1 + 1 + 9, 0xffd0d0d0);
+					fill(k1, i1 - 1, k1 + 1, i1 + 1 + 9, 0xffd0d0d0);
 				} else {
-					font.drawStringWithShadow("_", k1, i1, i);
+					font.drawTextWithShadow("_", k1, i1, i);
 				}
 			}
 
 			if (k != j) {
-				int l1 = l + font.getStringWidth(s.substring(0, k));
+				int l1 = l + font.getTextWidth(s.substring(0, k));
 				drawSelectionBox(k1, i1 - 1, l1 - 1, i1 + 1 + 9);
 			}
 		}
@@ -507,16 +510,16 @@ public class TextFieldWidget extends Gui {
 			startX = x + width;
 		}
 
-		Tessellator tessellator = Tessellator.instance;
+		Tessellator tessellator = Tessellator.INSTANCE;
 		GL11.glColor4f(0f, 0f, 255f, 255f);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_COLOR_LOGIC_OP);
 		GL11.glLogicOp(GL11.GL_OR_REVERSE);
-		tessellator.startDrawingQuads();
-		tessellator.addVertex(startX, endY, 0.0D);
-		tessellator.addVertex(endX, endY, 0.0D);
-		tessellator.addVertex(endX, startY, 0.0D);
-		tessellator.addVertex(startX, startY, 0.0D);
+		tessellator.start();
+		tessellator.pos(startX, endY, 0.0D);
+		tessellator.pos(endX, endY, 0.0D);
+		tessellator.pos(endX, startY, 0.0D);
+		tessellator.pos(startX, startY, 0.0D);
 		tessellator.draw();
 		GL11.glDisable(GL11.GL_COLOR_LOGIC_OP);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -680,7 +683,7 @@ public class TextFieldWidget extends Gui {
 	}
 
 	private static boolean isCtrlKeyDown() {
-		if (MinecraftAccessor.getOS() == EnumOS2.macos) {
+		if (MinecraftAccessor.getOS() == OperatingSystem.MACOS) {
 			return Keyboard.isKeyDown(Keyboard.KEY_LMETA) || Keyboard.isKeyDown(Keyboard.KEY_RMETA);
 		} else {
 			return Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
@@ -719,15 +722,15 @@ public class TextFieldWidget extends Gui {
 		}
 	}
 
-	private static String trimStringToWidth(FontRenderer font, String text, int maxWidth) {
+	private static String trimStringToWidth(TextRenderer font, String text, int maxWidth) {
 		return trimStringToWidth(font, text, maxWidth, false);
 	}
 
-	private static String trimStringToWidth(FontRenderer font, String text, int maxWidth, boolean reverse) {
+	private static String trimStringToWidth(TextRenderer font, String text, int maxWidth, boolean reverse) {
 		int width = 0;
 		int length;
 		for (length = 0; length < text.length() && width < maxWidth; length++)
-			width += font.getStringWidth(Character.toString(text.charAt(reverse ? text.length() - 1 - length : length)));
+			width += font.getTextWidth(Character.toString(text.charAt(reverse ? text.length() - 1 - length : length)));
 		return reverse ? text.substring(text.length() - length) : text.substring(0, length);
 	}
 

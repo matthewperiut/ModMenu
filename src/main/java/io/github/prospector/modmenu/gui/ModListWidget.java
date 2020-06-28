@@ -11,8 +11,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.MathHelper;
-import net.minecraft.src.Tessellator;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.util.maths.MathsHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
@@ -181,7 +181,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 	@Override
 	protected void renderList(int x, int y, int mouseX, int mouseY, float delta) {
 		int itemCount = this.getItemCount();
-		Tessellator tessellator_1 = Tessellator.instance;
+		Tessellator tessellator_1 = Tessellator.INSTANCE;
 
 		for (int index = 0; index < itemCount; ++index) {
 			int entryTop = this.getRowTop(index) + 2;
@@ -197,18 +197,18 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 					GL11.glDisable(GL11.GL_TEXTURE_2D);
 					float float_2 = this.isFocused() ? 1.0F : 0.5F;
 					GL11.glColor4f(float_2, float_2, float_2, 1f);
-					tessellator_1.startDrawingQuads();
-					tessellator_1.addVertex((double) entryLeft, (double) (entryTop + entryHeight + 2), 0.0D);
-					tessellator_1.addVertex((double) selectionRight, (double) (entryTop + entryHeight + 2), 0.0D);
-					tessellator_1.addVertex((double) selectionRight, (double) (entryTop - 2), 0.0D);
-					tessellator_1.addVertex((double) entryLeft, (double) (entryTop - 2), 0.0D);
+					tessellator_1.start();
+					tessellator_1.pos((double) entryLeft, (double) (entryTop + entryHeight + 2), 0.0D);
+					tessellator_1.pos((double) selectionRight, (double) (entryTop + entryHeight + 2), 0.0D);
+					tessellator_1.pos((double) selectionRight, (double) (entryTop - 2), 0.0D);
+					tessellator_1.pos((double) entryLeft, (double) (entryTop - 2), 0.0D);
 					tessellator_1.draw();
 					GL11.glColor4f(0f, 0f, 0f, 1f);
-					tessellator_1.startDrawingQuads();
-					tessellator_1.addVertex((double) (entryLeft + 1), (double) (entryTop + entryHeight + 1), 0.0D);
-					tessellator_1.addVertex((double) (selectionRight - 1), (double) (entryTop + entryHeight + 1), 0.0D);
-					tessellator_1.addVertex((double) (selectionRight - 1), (double) (entryTop - 1), 0.0D);
-					tessellator_1.addVertex((double) (entryLeft + 1), (double) (entryTop - 1), 0.0D);
+					tessellator_1.start();
+					tessellator_1.pos((double) (entryLeft + 1), (double) (entryTop + entryHeight + 1), 0.0D);
+					tessellator_1.pos((double) (selectionRight - 1), (double) (entryTop + entryHeight + 1), 0.0D);
+					tessellator_1.pos((double) (selectionRight - 1), (double) (entryTop - 1), 0.0D);
+					tessellator_1.pos((double) (entryLeft + 1), (double) (entryTop - 1), 0.0D);
 					tessellator_1.draw();
 					GL11.glEnable(GL11.GL_TEXTURE_2D);
 				}
@@ -249,7 +249,7 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 	}
 
 	public final ModListEntry getEntryAtPos(double x, double y) {
-		int int_5 = MathHelper.convertToBlockCoord(y - (double) this.top) - this.headerHeight + (int) this.getScrollAmount() - 4;
+		int int_5 = MathsHelper.floor(y - (double) this.top) - this.headerHeight + (int) this.getScrollAmount() - 4; // convertToBlockCoord
 		int index = int_5 / this.itemHeight;
 		return x < (double) this.getScrollbarPosition() && x >= (double) getRowLeft() && x <= (double) (getRowLeft() + getRowWidth()) && index >= 0 && int_5 >= 0 && index < this.getItemCount() ? this.children().get(index) : null;
 	}

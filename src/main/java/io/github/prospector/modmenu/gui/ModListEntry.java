@@ -8,8 +8,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.FontRenderer;
-import net.minecraft.src.Tessellator;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.TextRenderer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
@@ -45,28 +45,28 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 		GL11.glColor4f(1f, 1f, 1f, 1f);
 		this.bindIconTexture();
 		GL11.glEnable(GL11.GL_BLEND);
-		Tessellator tess = Tessellator.instance;
-		tess.startDrawingQuads();
-		tess.addVertexWithUV(x, y, 0, 0, 0);
-		tess.addVertexWithUV(x, y + 32, 0, 0, 1);
-		tess.addVertexWithUV(x + 32, y + 32, 0, 1, 1);
-		tess.addVertexWithUV(x + 32, y, 0, 1, 0);
+		Tessellator tess = Tessellator.INSTANCE;
+		tess.start();
+		tess.vertex(x, y, 0, 0, 0);
+		tess.vertex(x, y + 32, 0, 0, 1);
+		tess.vertex(x + 32, y + 32, 0, 1, 1);
+		tess.vertex(x + 32, y, 0, 1, 0);
 		tess.draw();
 		GL11.glDisable(GL11.GL_BLEND);
 		String name = HardcodedUtil.formatFabricModuleName(metadata.getName());
 		String trimmedName = name;
 		int maxNameWidth = rowWidth - 32 - 3;
-		FontRenderer font = this.client.field_6314_o;
-		if (font.getStringWidth(name) > maxNameWidth) {
-			int maxWidth = maxNameWidth - font.getStringWidth("...");
+		TextRenderer font = this.client.textRenderer;
+		if (font.getTextWidth(name) > maxNameWidth) {
+			int maxWidth = maxNameWidth - font.getTextWidth("...");
 			trimmedName = "";
-			while (font.getStringWidth(trimmedName) < maxWidth && trimmedName.length() < name.length()) {
+			while (font.getTextWidth(trimmedName) < maxWidth && trimmedName.length() < name.length()) {
 				trimmedName += name.charAt(trimmedName.length());
 			}
 			trimmedName = trimmedName.isEmpty() ? "..." : trimmedName.substring(0, trimmedName.length() - 1) + "...";
 		}
-		font.drawString(trimmedName, x + 32 + 3, y + 1, 0xFFFFFF);
-		new BadgeRenderer(client, x + 32 + 3 + font.getStringWidth(name) + 2, y, x + rowWidth, container, list.getParent()).draw(mouseX, mouseY);
+		font.drawText(trimmedName, x + 32 + 3, y + 1, 0xFFFFFF);
+		new BadgeRenderer(client, x + 32 + 3 + font.getTextWidth(name) + 2, y, x + rowWidth, container, list.getParent()).draw(mouseX, mouseY);
 		String description = metadata.getDescription();
 		if (description.isEmpty() && HardcodedUtil.getHardcodedDescriptions().containsKey(metadata.getId())) {
 			description = HardcodedUtil.getHardcodedDescription(metadata.getId());
@@ -123,17 +123,17 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 		if (this.iconLocation == null) {
 			BufferedImage icon = this.createIcon();
 			if (icon != null) {
-				this.iconLocation = this.client.field_6315_n.func_1074_a(icon);
+				this.iconLocation = this.client.textureManager.method_1088(icon);
 			} else {
-				this.iconLocation = this.client.field_6315_n.getTexture(UNKNOWN_ICON);
+				this.iconLocation = this.client.textureManager.getTextureId(UNKNOWN_ICON);
 			}
 		}
-		this.client.field_6315_n.bindTexture(this.iconLocation);
+		this.client.textureManager.bindTexture(this.iconLocation);
 	}
 
 	public void deleteTexture() {
 		if (iconLocation != null) {
-			this.client.field_6315_n.func_1078_a(iconLocation);
+			this.client.textureManager.method_1085(iconLocation); // func_1078_a
 		}
 	}
 

@@ -3,18 +3,18 @@ package io.github.prospector.modmenu.gui;
 import io.github.prospector.modmenu.util.HardcodedUtil;
 import io.github.prospector.modmenu.util.RenderUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.FontRenderer;
+import net.minecraft.client.render.TextRenderer;
 
 public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget.DescriptionEntry> {
 
 	private final ModListScreen parent;
-	private final FontRenderer textRenderer;
+	private final TextRenderer textRenderer;
 	private ModListEntry lastSelected = null;
 
 	public DescriptionListWidget(Minecraft client, int width, int height, int top, int bottom, int entryHeight, ModListScreen parent) {
 		super(client, width, height, top, bottom, entryHeight);
 		this.parent = parent;
-		this.textRenderer = client.field_6314_o;
+		this.textRenderer = client.textRenderer;
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 
 		@Override
 		public void render(int index, int y, int x, int itemWidth, int itemHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-			textRenderer.drawStringWithShadow(text, x, y, 0xAAAAAA);
+			textRenderer.drawTextWithShadow(text, x, y, 0xAAAAAA);
 		}
 	}
 

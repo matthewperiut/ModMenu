@@ -1,10 +1,10 @@
 package io.github.prospector.modmenu.mixin;
 
-import net.minecraft.src.GuiButton;
+import net.minecraft.client.gui.widgets.Button;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(GuiButton.class)
+@Mixin(Button.class)
 public interface MixinGuiButton {
 
 	@Accessor

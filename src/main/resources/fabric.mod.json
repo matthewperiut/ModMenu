@@ -17,8 +17,8 @@
     "issues": "https://github.com/Prospector/ModMenu/issues"
   },
   "depends": {
-    "fabricloader": ">=0.7.6",
-    "minecraft": "1.0.0-alpha.2.2"
+    "fabricloader": "*",
+    "minecraft": "1.0.0-beta.7.3"
   },
   "authors": [
     "Prospector"
@@ -45,7 +45,8 @@
     "hinataaki",
     "LeonXu98",
     "magneticflux",
-    "Earthcomputer"
+    "Earthcomputer",
+	"Ambos"
   ],
   "description": "Adds a mod menu to view the list of mods you have installed.",
   "mixins": [

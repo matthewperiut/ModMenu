@@ -9,14 +9,14 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.Gui;
-import net.minecraft.src.MathHelper;
-import net.minecraft.src.Tessellator;
+import net.minecraft.client.gui.Screen;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.util.maths.MathsHelper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
 @Environment(EnvType.CLIENT)
-public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extends Gui {
+public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extends Screen {
 	protected static final int DRAG_OUTSIDE = -2;
 	protected final Minecraft minecraft;
 	protected final int itemHeight;
@@ -125,7 +125,7 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 		int j = this.left + this.width / 2;
 		int k = j - i;
 		int l = j + i;
-		int m = MathHelper.convertToBlockCoord(e - (double)this.top) - this.headerHeight + (int)this.getScrollAmount() - 4;
+		int m = MathsHelper.floor(e - (double)this.top) - this.headerHeight + (int)this.getScrollAmount() - 4; // convertToBlockCoord
 		int n = m / this.itemHeight;
 		return d < (double)this.getScrollbarPosition() && d >= (double)k && d <= (double)l && n >= 0 && m >= 0 && n < this.getItemCount() ? this.children().get(n) : null;
 	}
@@ -154,7 +154,8 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 	protected void renderHeader(int i, int j, Tessellator tessellator) {
 	}
 
-	protected void renderBackground() {
+
+	public void renderBackground() {
 	}
 
 	protected void renderDecorations(int i, int j) {
@@ -164,16 +165,16 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 		this.renderBackground();
 		int k = this.getScrollbarPosition();
 		int l = k + 6;
-		Tessellator tessellator = Tessellator.instance;
-		this.minecraft.field_6315_n.bindTexture(this.minecraft.field_6315_n.getTexture("/gui/background.png"));
+		Tessellator tessellator = Tessellator.INSTANCE;
+		this.minecraft.textureManager.bindTexture(this.minecraft.textureManager.getTextureId("/gui/background.png"));
 		GL11.glColor4f(1f, 1f, 1f, 1f);
 		float g = 32.0F;
-		tessellator.startDrawingQuads();
-		tessellator.setColorOpaque(32, 32, 32);
-		tessellator.addVertexWithUV((double)this.left, (double)this.bottom, 0.0D, (float)this.left / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F);
-		tessellator.addVertexWithUV((double)this.right, (double)this.bottom, 0.0D, (float)this.right / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F);
-		tessellator.addVertexWithUV((double)this.right, (double)this.top, 0.0D, (float)this.right / 32.0F, (float)(this.top + (int)this.getScrollAmount()) / 32.0F);
-		tessellator.addVertexWithUV((double)this.left, (double)this.top, 0.0D, (float)this.left / 32.0F, (float)(this.top + (int)this.getScrollAmount()) / 32.0F);
+		tessellator.start();
+		tessellator.colour(32, 32, 32);
+		tessellator.vertex((double)this.left, (double)this.bottom, 0.0D, (float)this.left / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F);
+		tessellator.vertex((double)this.right, (double)this.bottom, 0.0D, (float)this.right / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F);
+		tessellator.vertex((double)this.right, (double)this.top, 0.0D, (float)this.right / 32.0F, (float)(this.top + (int)this.getScrollAmount()) / 32.0F);
+		tessellator.vertex((double)this.left, (double)this.top, 0.0D, (float)this.left / 32.0F, (float)(this.top + (int)this.getScrollAmount()) / 32.0F);
 		tessellator.draw();
 		int m = this.getRowLeft();
 		int n = this.top + 4 - (int)this.getScrollAmount();
@@ -191,21 +192,21 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		boolean o = true;
-		tessellator.startDrawingQuads();
-		tessellator.setColorRGBA(0, 0, 0, 0);
-		tessellator.addVertexWithUV((double)this.left, (double)(this.top + 4), 0.0D, 0.0F, 1.0F);
-		tessellator.addVertexWithUV((double)this.right, (double)(this.top + 4), 0.0D, 1.0F, 1.0F);
-		tessellator.setColorOpaque(0, 0, 0);
-		tessellator.addVertexWithUV((double)this.right, (double)this.top, 0.0D, 1.0F, 0.0F);
-		tessellator.addVertexWithUV((double)this.left, (double)this.top, 0.0D, 0.0F, 0.0F);
+		tessellator.start();
+		tessellator.colour(0, 0, 0, 0);
+		tessellator.vertex((double)this.left, (double)(this.top + 4), 0.0D, 0.0F, 1.0F);
+		tessellator.vertex((double)this.right, (double)(this.top + 4), 0.0D, 1.0F, 1.0F);
+		tessellator.colour(0, 0, 0);
+		tessellator.vertex((double)this.right, (double)this.top, 0.0D, 1.0F, 0.0F);
+		tessellator.vertex((double)this.left, (double)this.top, 0.0D, 0.0F, 0.0F);
 		tessellator.draw();
-		tessellator.startDrawingQuads();
-		tessellator.setColorOpaque(0, 0, 0);
-		tessellator.addVertexWithUV((double)this.left, (double)this.bottom, 0.0D, 0.0F, 1.0F);
-		tessellator.addVertexWithUV((double)this.right, (double)this.bottom, 0.0D, 1.0F, 1.0F);
-		tessellator.setColorRGBA(0, 0, 0, 0);
-		tessellator.addVertexWithUV((double)this.right, (double)(this.bottom - 4), 0.0D, 1.0F, 0.0F);
-		tessellator.addVertexWithUV((double)this.left, (double)(this.bottom - 4), 0.0D, 0.0F, 0.0F);
+		tessellator.start();
+		tessellator.colour(0, 0, 0);
+		tessellator.vertex((double)this.left, (double)this.bottom, 0.0D, 0.0F, 1.0F);
+		tessellator.vertex((double)this.right, (double)this.bottom, 0.0D, 1.0F, 1.0F);
+		tessellator.colour(0, 0, 0, 0);
+		tessellator.vertex((double)this.right, (double)(this.bottom - 4), 0.0D, 1.0F, 0.0F);
+		tessellator.vertex((double)this.left, (double)(this.bottom - 4), 0.0D, 0.0F, 0.0F);
 		tessellator.draw();
 		int p = this.getMaxScroll();
 		if (p > 0) {
@@ -219,26 +220,26 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 				r = this.top;
 			}
 
-			tessellator.startDrawingQuads();
-			tessellator.setColorOpaque(0, 0, 0);
-			tessellator.addVertexWithUV((double)k, (double)this.bottom, 0.0D, 0.0F, 1.0F);
-			tessellator.addVertexWithUV((double)l, (double)this.bottom, 0.0D, 1.0F, 1.0F);
-			tessellator.addVertexWithUV((double)l, (double)this.top, 0.0D, 1.0F, 0.0F);
-			tessellator.addVertexWithUV((double)k, (double)this.top, 0.0D, 0.0F, 0.0F);
+			tessellator.start();
+			tessellator.colour(0, 0, 0);
+			tessellator.vertex((double)k, (double)this.bottom, 0.0D, 0.0F, 1.0F);
+			tessellator.vertex((double)l, (double)this.bottom, 0.0D, 1.0F, 1.0F);
+			tessellator.vertex((double)l, (double)this.top, 0.0D, 1.0F, 0.0F);
+			tessellator.vertex((double)k, (double)this.top, 0.0D, 0.0F, 0.0F);
 			tessellator.draw();
-			tessellator.startDrawingQuads();
-			tessellator.setColorOpaque(128, 128, 128);
-			tessellator.addVertexWithUV((double)k, (double)(r + q), 0.0D, 0.0F, 1.0F);
-			tessellator.addVertexWithUV((double)l, (double)(r + q), 0.0D, 1.0F, 1.0F);
-			tessellator.addVertexWithUV((double)l, (double)r, 0.0D, 1.0F, 0.0F);
-			tessellator.addVertexWithUV((double)k, (double)r, 0.0D, 0.0F, 0.0F);
+			tessellator.start();
+			tessellator.colour(128, 128, 128);
+			tessellator.vertex((double)k, (double)(r + q), 0.0D, 0.0F, 1.0F);
+			tessellator.vertex((double)l, (double)(r + q), 0.0D, 1.0F, 1.0F);
+			tessellator.vertex((double)l, (double)r, 0.0D, 1.0F, 0.0F);
+			tessellator.vertex((double)k, (double)r, 0.0D, 0.0F, 0.0F);
 			tessellator.draw();
-			tessellator.startDrawingQuads();
-			tessellator.setColorOpaque(192, 192, 192);
-			tessellator.addVertexWithUV((double)k, (double)(r + q - 1), 0.0D, 0.0F, 1.0F);
-			tessellator.addVertexWithUV((double)(l - 1), (double)(r + q - 1), 0.0D, 1.0F, 1.0F);
-			tessellator.addVertexWithUV((double)(l - 1), (double)r, 0.0D, 1.0F, 0.0F);
-			tessellator.addVertexWithUV((double)k, (double)r, 0.0D, 0.0F, 0.0F);
+			tessellator.start();
+			tessellator.colour(192, 192, 192);
+			tessellator.vertex((double)k, (double)(r + q - 1), 0.0D, 0.0F, 1.0F);
+			tessellator.vertex((double)(l - 1), (double)(r + q - 1), 0.0D, 1.0F, 1.0F);
+			tessellator.vertex((double)(l - 1), (double)r, 0.0D, 1.0F, 0.0F);
+			tessellator.vertex((double)k, (double)r, 0.0D, 0.0F, 0.0F);
 			tessellator.draw();
 		}
 
@@ -394,7 +395,7 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 
 	protected void renderList(int i, int j, int k, int l, float f) {
 		int m = this.getItemCount();
-		Tessellator tessellator = Tessellator.instance;
+		Tessellator tessellator = Tessellator.INSTANCE;
 
 		for(int n = 0; n < m; ++n) {
 			int o = this.getRowTop(n);
@@ -411,18 +412,18 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 					GL11.glDisable(GL11.GL_TEXTURE_2D);
 					float g = this.isFocused() ? 1.0F : 0.5F;
 					GL11.glColor4f(g, g, g, 1f);
-					tessellator.startDrawingQuads();
-					tessellator.addVertex((double)v, (double)(q + r + 2), 0.0D);
-					tessellator.addVertex((double)u, (double)(q + r + 2), 0.0D);
-					tessellator.addVertex((double)u, (double)(q - 2), 0.0D);
-					tessellator.addVertex((double)v, (double)(q - 2), 0.0D);
+					tessellator.start();
+					tessellator.pos((double)v, (double)(q + r + 2), 0.0D);
+					tessellator.pos((double)u, (double)(q + r + 2), 0.0D);
+					tessellator.pos((double)u, (double)(q - 2), 0.0D);
+					tessellator.pos((double)v, (double)(q - 2), 0.0D);
 					tessellator.draw();
 					GL11.glColor4f(0f, 0f, 0f, 1f);
-					tessellator.startDrawingQuads();
-					tessellator.addVertex((double)(v + 1), (double)(q + r + 1), 0.0D);
-					tessellator.addVertex((double)(u - 1), (double)(q + r + 1), 0.0D);
-					tessellator.addVertex((double)(u - 1), (double)(q - 1), 0.0D);
-					tessellator.addVertex((double)(v + 1), (double)(q - 1), 0.0D);
+					tessellator.start();
+					tessellator.pos((double)(v + 1), (double)(q + r + 1), 0.0D);
+					tessellator.pos((double)(u - 1), (double)(q + r + 1), 0.0D);
+					tessellator.pos((double)(u - 1), (double)(q - 1), 0.0D);
+					tessellator.pos((double)(v + 1), (double)(q - 1), 0.0D);
 					tessellator.draw();
 					GL11.glEnable(GL11.GL_TEXTURE_2D);
 				}
@@ -451,17 +452,17 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 	}
 
 	protected void renderHoleBackground(int i, int j, int k, int l) {
-		Tessellator tessellator = Tessellator.instance;
-		this.minecraft.field_6315_n.bindTexture(this.minecraft.field_6315_n.getTexture("/gui/background.png"));
+		Tessellator tessellator = Tessellator.INSTANCE;
+		this.minecraft.textureManager.bindTexture(this.minecraft.textureManager.getTextureId("/gui/background.png"));
 		GL11.glColor4f(1f, 1f, 1f, 1f);
 		float f = 32.0F;
-		tessellator.startDrawingQuads();
-		tessellator.setColorRGBA(64, 64, 64, l);
-		tessellator.addVertexWithUV((double)this.left, (double)j, 0.0D, 0.0F, (float)j / 32.0F);
-		tessellator.addVertexWithUV((double)(this.left + this.width), (double)j, 0.0D, (float)this.width / 32.0F, (float)j / 32.0F);
-		tessellator.setColorRGBA(64, 64, 64, k);
-		tessellator.addVertexWithUV((double)(this.left + this.width), (double)i, 0.0D, (float)this.width / 32.0F, (float)i / 32.0F);
-		tessellator.addVertexWithUV((double)this.left, (double)i, 0.0D, 0.0F, (float)i / 32.0F);
+		tessellator.start();
+		tessellator.colour(64, 64, 64, l);
+		tessellator.vertex((double)this.left, (double)j, 0.0D, 0.0F, (float)j / 32.0F);
+		tessellator.vertex((double)(this.left + this.width), (double)j, 0.0D, (float)this.width / 32.0F, (float)j / 32.0F);
+		tessellator.colour(64, 64, 64, k);
+		tessellator.vertex((double)(this.left + this.width), (double)i, 0.0D, (float)this.width / 32.0F, (float)i / 32.0F);
+		tessellator.vertex((double)this.left, (double)i, 0.0D, 0.0F, (float)i / 32.0F);
 		tessellator.draw();
 	}
 
@@ -512,7 +513,7 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 	}
 
 	@Environment(EnvType.CLIENT)
-	public abstract static class Entry<E extends EntryListWidget.Entry<E>> extends Gui {
+	public abstract static class Entry<E extends EntryListWidget.Entry<E>> extends Screen {
 		@Deprecated
 		EntryListWidget<E> list;
 

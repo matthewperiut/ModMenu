@@ -3,31 +3,31 @@ package io.github.prospector.modmenu.mixin;
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.gui.ModListScreen;
 import io.github.prospector.modmenu.gui.ModMenuButtonWidget;
-import net.minecraft.src.GuiButton;
-import net.minecraft.src.GuiMainMenu;
-import net.minecraft.src.GuiScreen;
+import net.minecraft.client.gui.Screen;
+import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.widgets.Button;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(GuiMainMenu.class)
-public class MixinTitleScreen extends GuiScreen {
+@Mixin(TitleScreen.class)
+public class MixinTitleScreen extends Screen {
 
 	@SuppressWarnings("unchecked")
-	@Inject(at = @At("RETURN"), method = "func_6448_a")
+	@Inject(at = @At("RETURN"), method = "init")
 	public void drawMenuButton(CallbackInfo info) {
-		GuiButton texturePackButton = (GuiButton) this.controlList.get(this.controlList.size() - 2);
-		texturePackButton.displayString = "Texture Packs";
-		int newWidth = ((MixinGuiButton) texturePackButton).getWidth() / 2 - 5;
+		Button texturePackButton = minecraft.isApplet ? (Button) this.buttons.get(this.buttons.size() - 2) : (Button) this.buttons.get(2);
+		texturePackButton.text = "Texture Packs";
+		int newWidth = ((MixinGuiButton) texturePackButton).getWidth() / 2 - 1;
 		((MixinGuiButton) texturePackButton).setWidth(newWidth);
-		this.controlList.add(new ModMenuButtonWidget(100, this.width / 2 + 6, texturePackButton.yPosition, newWidth, 20,  "Mods (" + ModMenu.getFormattedModCount() + " loaded)"));
+		this.buttons.add(new ModMenuButtonWidget(100, this.width / 2 + 2, texturePackButton.y, newWidth, 20,  "Mods (" + ModMenu.getFormattedModCount() + " loaded)"));
 	}
 
-	@Inject(method = "actionPerformed", at = @At("HEAD"))
-	private void onActionPerformed(GuiButton button, CallbackInfo ci) {
+	@Inject(method = "buttonClicked", at = @At("HEAD"))
+	private void onActionPerformed(Button button, CallbackInfo ci) {
 		if (button.id == 100) {
-			mc.func_6272_a(new ModListScreen(this));
+			minecraft.openScreen(new ModListScreen(this));
 		}
 	}
 
