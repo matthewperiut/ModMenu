@@ -7,10 +7,10 @@ A picture's worth 2 words
 
 ![](https://i.imgur.com/JKEatou.png "Mod Menu")
 
-### Installation on Alpha 1.2.2a
+### Installation on Beta 1.7.3
 1. Download and install [MultiMC](https://multimc.org/#Download) if you haven't already.
-1. If you haven't already, press "create instance", and press "import from zip", and paste the following URL into the text field: https://cdn.discordapp.com/attachments/666758878813487136/699323306637262928/fabric-alpha.zip
-1. Download ModMenu from the [releases page](https://github.com/pack-png-mods/ModMenu/releases).
+1. If you haven't already, press "create instance", and press "import from zip", and paste the following URL into the text field: https://github.com/calmilamsy/Cursed-Fabric-MultiMC/archive/master.zip
+1. Download ModMenu from the [releases page](https://github.com/Amb0s/ModMenu/releases).
 1. Click on your new MultiMC instance and click "edit instance" on the right. Click "loader mods" then "add", and navigate to the mod you just downloaded, and press OK.
 
 ### Developers:
