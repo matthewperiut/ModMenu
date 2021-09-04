@@ -1,15 +1,14 @@
 package io.github.prospector.modmenu.api;
 
 import io.github.prospector.modmenu.ModMenu;
-import net.minecraft.client.gui.Screen;
-
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import net.minecraft.client.gui.screen.ScreenBase;
 
 public interface ModMenuApi {
 	/**
-	 * Replaced with {@link ModMenuApi#getConfigScreen(Screen)}, with
+	 * Replaced with {@link ModMenuApi#getConfigScreen(ScreenBase)}, with
 	 * the ModMenuApi implemented onto a class that is added as an
 	 * entry point to your fabric mod metadata.
 	 *
@@ -35,7 +34,7 @@ public interface ModMenuApi {
 	 * @deprecated Will be removed in 1.15 snapshots.
 	 */
 	@Deprecated
-	default Optional<Supplier<Screen>> getConfigScreen(Screen screen) {
+	default Optional<Supplier<ScreenBase>> getConfigScreen(ScreenBase screen) {
 		return Optional.empty();
 	}
 
@@ -46,7 +45,7 @@ public interface ModMenuApi {
 	 *
 	 * @return A factory function for constructing config screen instances.
 	 */
-	default Function<Screen, ? extends Screen> getConfigScreenFactory() {
+	default Function<ScreenBase, ? extends ScreenBase> getConfigScreenFactory() {
 		return screen -> getConfigScreen(screen).map(Supplier::get).orElse(null);
 	}
 }

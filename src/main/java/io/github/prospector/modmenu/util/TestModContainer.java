@@ -96,6 +96,11 @@ public class TestModContainer implements ModContainer {
 		}
 
 		@Override
+		public ModEnvironment getEnvironment() {
+			return null;
+		}
+
+		@Override
 		public Collection<ModDependency> getDepends() {
 			return Collections.emptyList();
 		}
@@ -163,6 +168,11 @@ public class TestModContainer implements ModContainer {
 		@Override
 		public CustomValue getCustomValue(String key) {
 			return null;
+		}
+
+		@Override
+		public Map<String, CustomValue> getCustomValues() {
+			return new HashMap<>();
 		}
 	}
 }

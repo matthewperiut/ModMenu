@@ -3,16 +3,16 @@ package io.github.prospector.modmenu.mixin;
 import io.github.prospector.modmenu.ModMenu;
 import io.github.prospector.modmenu.gui.ModListScreen;
 import io.github.prospector.modmenu.gui.ModMenuButtonWidget;
-import net.minecraft.client.gui.Screen;
-import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.screen.ScreenBase;
+import net.minecraft.client.gui.screen.menu.MainMenu;
 import net.minecraft.client.gui.widgets.Button;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(TitleScreen.class)
-public class MixinTitleScreen extends Screen {
+@Mixin(MainMenu.class)
+public class MixinTitleScreen extends ScreenBase {
 
 	@SuppressWarnings("unchecked")
 	@Inject(at = @At("RETURN"), method = "init")

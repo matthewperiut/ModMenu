@@ -13,7 +13,7 @@ import java.io.InputStream;
 @Mixin({TexturePack.class, ZippedTexturePack.class})
 public class MixinTexturePacks {
 
-	@Inject(method = "method_976", at = @At(value = "INVOKE", target = "Ljava/lang/Class;getResourceAsStream(Ljava/lang/String;)Ljava/io/InputStream;", remap = false), cancellable = true)
+	@Inject(method = "getResourceAsStream", at = @At(value = "INVOKE", target = "Ljava/lang/Class;getResourceAsStream(Ljava/lang/String;)Ljava/io/InputStream;", remap = false), cancellable = true)
 	private void onGetResource(String resource, CallbackInfoReturnable<InputStream> ci) {
 		InputStream in = ModMenu.class.getClassLoader().getResourceAsStream(resource);
 		if (in != null)

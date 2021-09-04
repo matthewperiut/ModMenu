@@ -1,8 +1,8 @@
 package io.github.prospector.modmenu.gui;
 
 import io.github.prospector.modmenu.mixin.MinecraftAccessor;
-import net.minecraft.client.OperatingSystem;
-import net.minecraft.client.gui.Screen;
+import net.minecraft.client.EnumOperatingSystems;
+import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.TextRenderer;
 import org.lwjgl.input.Keyboard;
@@ -12,7 +12,7 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.util.function.Predicate;
 
-public class TextFieldWidget extends Screen {
+public class TextFieldWidget extends ScreenBase {
 	private final TextRenderer font;
 	public int x;
 	public int y;
@@ -302,7 +302,7 @@ public class TextFieldWidget extends Screen {
 			return true;
 		} else if (isKeyComboCtrlV(keyCode)) {
 			if (isEnabled) {
-				writeText(Screen.getClipboardContents());
+				writeText(ScreenBase.getClipboardContents());
 			}
 
 			return true;
@@ -516,10 +516,10 @@ public class TextFieldWidget extends Screen {
 		GL11.glEnable(GL11.GL_COLOR_LOGIC_OP);
 		GL11.glLogicOp(GL11.GL_OR_REVERSE);
 		tessellator.start();
-		tessellator.pos(startX, endY, 0.0D);
-		tessellator.pos(endX, endY, 0.0D);
-		tessellator.pos(endX, startY, 0.0D);
-		tessellator.pos(startX, startY, 0.0D);
+		tessellator.addVertex(startX, endY, 0.0D);
+		tessellator.addVertex(endX, endY, 0.0D);
+		tessellator.addVertex(endX, startY, 0.0D);
+		tessellator.addVertex(startX, startY, 0.0D);
 		tessellator.draw();
 		GL11.glDisable(GL11.GL_COLOR_LOGIC_OP);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -683,7 +683,7 @@ public class TextFieldWidget extends Screen {
 	}
 
 	private static boolean isCtrlKeyDown() {
-		if (MinecraftAccessor.getOS() == OperatingSystem.MACOS) {
+		if (MinecraftAccessor.getOS() == EnumOperatingSystems.MACOS) {
 			return Keyboard.isKeyDown(Keyboard.KEY_LMETA) || Keyboard.isKeyDown(Keyboard.KEY_RMETA);
 		} else {
 			return Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);

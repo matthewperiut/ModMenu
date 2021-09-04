@@ -2,7 +2,7 @@ package io.github.prospector.modmenu.util;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.Screen;
+import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.render.TextRenderer;
 
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
-public class RenderUtils extends Screen {
+public class RenderUtils extends ScreenBase {
 
 	public static final RenderUtils INSTANCE = new RenderUtils();
 	private RenderUtils() {}

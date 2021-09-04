@@ -12,7 +12,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Screen;
+import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.gui.widgets.Button;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.TextRenderer;
@@ -31,14 +31,14 @@ import java.net.MalformedURLException;
 import java.text.NumberFormat;
 import java.util.*;
 
-public class ModListScreen extends Screen {
+public class ModListScreen extends ScreenBase {
 	private static final String FILTERS_BUTTON_LOCATION = "/assets/" + ModMenu.MOD_ID + "/textures/gui/filters_button.png";
 	private static final String CONFIGURE_BUTTON_LOCATION = "/assets/" + ModMenu.MOD_ID + "/textures/gui/configure_button.png";
 	private static final Logger LOGGER = LogManager.getLogger();
 	private final String textTitle;
 	private TextFieldWidget searchBox;
 	private DescriptionListWidget descriptionListWidget;
-	private Screen parent;
+	private ScreenBase parent;
 	private ModListWidget modList;
 	private String tooltip;
 	private ModListEntry selected;
@@ -63,7 +63,7 @@ public class ModListScreen extends Screen {
 	private static final int MODS_FOLDER_BUTTON_ID = 6;
 	private static final int DONE_BUTTON_ID = 7;
 
-	public ModListScreen(Screen previousGui) {
+	public ModListScreen(ScreenBase previousGui) {
 		this.parent = previousGui;
 		this.textTitle = "Mods";
 	}
@@ -71,7 +71,7 @@ public class ModListScreen extends Screen {
 	@Override
 	public void onMouseEvent() {
 		super.onMouseEvent();
-		int dWheel = Mouse.getEventDWheel();
+		int dWheel = Mouse.getEventDWheel()/50;
 		if (dWheel != 0) {
 			int mouseX = Mouse.getEventX() * this.width / this.minecraft.actualWidth; // field_6326_c
 			int mouseY = this.height - Mouse.getEventY() * this.height / this.minecraft.actualHeight - 1; // field_6325_d
@@ -109,7 +109,7 @@ public class ModListScreen extends Screen {
 		this.modList.setLeftPos(0);
 		this.descriptionListWidget = new DescriptionListWidget(this.minecraft, paneWidth, this.height, paneY + 60, this.height - 36, 9 + 1, this);
 		this.descriptionListWidget.setLeftPos(rightPaneX);
-		Button configureButton = new ModMenuTexturedButtonWidget(CONFIGURE_BUTTON_ID, width - 24, paneY, 20, 20, 0, 0, CONFIGURE_BUTTON_LOCATION, 32, 64, "Configure...") {
+		Button configureButton = new ModMenuTexturedButtonWidget(CONFIGURE_BUTTON_ID, width - 24, paneY, 20, 20, 0, 0, CONFIGURE_BUTTON_LOCATION, 32, 64) {
 			@Override
 			public void render(Minecraft mc, int mouseX, int mouseY) {
 				if (selected != null) {
@@ -124,8 +124,8 @@ public class ModListScreen extends Screen {
 			}
 		};
 		int urlButtonWidths = paneWidth / 2 - 2;
-		int cappedButtonWidth = urlButtonWidths > 200 ? 200 : urlButtonWidths;
-		Button websiteButton = new Button(WEBSITE_BUTTON_ID, rightPaneX + (urlButtonWidths / 2) - (cappedButtonWidth / 2), paneY + 36, urlButtonWidths > 200 ? 200 : urlButtonWidths, 20, "Website") {
+		int cappedButtonWidth = Math.min(urlButtonWidths, 200);
+		Button websiteButton = new Button(WEBSITE_BUTTON_ID, rightPaneX + (urlButtonWidths / 2) - (cappedButtonWidth / 2), paneY + 36, Math.min(urlButtonWidths, 200), 20, "Website") {
 			@Override
 			public void render(Minecraft mc, int var1, int var2) {
 				visible = selected != null; // visible = selected != null
@@ -133,7 +133,7 @@ public class ModListScreen extends Screen {
 				super.render(mc, var1, var2);
 			}
 		};
-		Button issuesButton = new Button(ISSUES_BUTTON_ID, rightPaneX + urlButtonWidths + 4 + (urlButtonWidths / 2) - (cappedButtonWidth / 2), paneY + 36, urlButtonWidths > 200 ? 200 : urlButtonWidths, 20, "Issues") {
+		Button issuesButton = new Button(ISSUES_BUTTON_ID, rightPaneX + urlButtonWidths + 4 + (urlButtonWidths / 2) - (cappedButtonWidth / 2), paneY + 36, Math.min(urlButtonWidths, 200), 20, "Issues") {
 			@Override
 			public void render(Minecraft mc, int var1, int var2) {
 				visible = selected != null; // visible = selected != null
@@ -194,7 +194,7 @@ public class ModListScreen extends Screen {
 		switch (button.id) {
 			case CONFIGURE_BUTTON_ID: {
 				final String modid = Objects.requireNonNull(selected).getMetadata().getId();
-				final Screen screen = ModMenu.getConfigScreen(modid, this);
+				final ScreenBase screen = ModMenu.getConfigScreen(modid, this);
 				if (screen != null) {
 					minecraft.openScreen(screen);
 				} else {
@@ -264,16 +264,7 @@ public class ModListScreen extends Screen {
 	@Override
 	protected void mouseReleased(int mouseX, int mouseY, int mouseButton) {
 		super.mouseReleased(mouseX, mouseY, mouseButton);
-		if (mouseButton == -1) {
-			int mouseDX = Mouse.getEventDX() * this.width / this.minecraft.actualWidth; // field_6326_c
-			int mouseDY = this.height - Mouse.getEventDY() * this.height / this.minecraft.actualHeight - 1; // field_6325_d
-			for (int button = 0; button < Mouse.getButtonCount(); button++) {
-				if (Mouse.isButtonDown(button)) {
-					modList.mouseDragged(mouseX, mouseY, mouseButton, mouseDX, mouseDY);
-					descriptionListWidget.mouseDragged(mouseX, mouseY, mouseButton, mouseDX, mouseDY);
-				}
-			}
-		} else {
+		if (mouseButton != -1) {
 			modList.mouseReleased(mouseX, mouseY, mouseButton);
 			descriptionListWidget.mouseReleased(mouseX, mouseY, mouseButton);
 		}
@@ -281,6 +272,14 @@ public class ModListScreen extends Screen {
 
 	@Override
 	public void render(int mouseX, int mouseY, float delta) {
+		int mouseDX = Mouse.getEventDX() * this.width / this.minecraft.actualWidth; // field_6326_c
+		int mouseDY = this.height - Mouse.getEventDY() * this.height / this.minecraft.actualHeight - 1; // field_6325_d
+		for (int button = 0; button < Mouse.getButtonCount(); button++) {
+			if (Mouse.isButtonDown(button)) {
+				modList.mouseDragged(mouseX, mouseY, button, mouseDX, mouseDY);
+				descriptionListWidget.mouseDragged(mouseX, mouseY, button, mouseDX, mouseDY);
+			}
+		}
 		TextRenderer font = this.textManager;
 		if (!searchBox.getText().equals(lastSearchString)) {
 			lastSearchString = searchBox.getText();
@@ -485,11 +484,11 @@ public class ModListScreen extends Screen {
 		Tessellator tessellator = Tessellator.INSTANCE;
 		tessellator.start();
 		tessellator.colour(g, h, o, f);
-		tessellator.pos((double)k, (double)j, 300);
-		tessellator.pos((double)i, (double)j, 300);
+		tessellator.addVertex(k, j, 300);
+		tessellator.addVertex(i, j, 300);
 		tessellator.colour(q, r, s, p);
-		tessellator.pos((double)i, (double)l, 300);
-		tessellator.pos((double)k, (double)l, 300);
+		tessellator.addVertex(i, l, 300);
+		tessellator.addVertex(k, l, 300);
 		tessellator.draw();
 		GL11.glShadeModel(GL11.GL_FLAT);
 		GL11.glDisable(GL11.GL_BLEND);
