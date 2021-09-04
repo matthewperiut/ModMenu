@@ -91,6 +91,11 @@ public class TestModContainer implements ModContainer {
 		}
 
 		@Override
+		public Collection<String> getProvides() {
+			return null;
+		}
+
+		@Override
 		public Version getVersion() {
 			return this.version;
 		}
