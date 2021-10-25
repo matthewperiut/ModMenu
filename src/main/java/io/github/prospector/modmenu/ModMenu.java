@@ -13,7 +13,10 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.CustomValue;
 import net.fabricmc.loader.api.metadata.ModMetadata;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.ScreenBase;
+import net.minecraft.client.gui.screen.menu.Options;
+
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.function.Function;
@@ -63,6 +66,7 @@ public class ModMenu implements ClientModInitializer {
 		ModMenuConfigManager.initializeConfig();
 		ImmutableMap.Builder<String, Function<ScreenBase, ? extends ScreenBase>> factories = ImmutableMap.builder();
 		FabricLoader.getInstance().getEntrypoints("modmenu", ModMenuApi.class).forEach(api -> factories.put(api.getModId(), api.getConfigScreenFactory()));
+		factories.put("minecraft", (screenBase -> new Options(screenBase, ((Minecraft) FabricLoader.getInstance().getGameInstance()).options)));
 		configScreenFactories = factories.build();
 		Collection<ModContainer> mods = FabricLoader.getInstance().getAllMods();
 		HardcodedUtil.initializeHardcodings();
