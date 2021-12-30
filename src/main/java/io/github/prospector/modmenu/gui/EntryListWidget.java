@@ -334,7 +334,7 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 
 	double oldY = -1;
 	public boolean mouseDragged(double mouseX, double mouseY, int mouseButton, double mouseDX, double mouseDY) {
-		if (mouseButton == 0) {
+		if (mouseButton == 0 && isMouseOver(mouseX, mouseY)) {
 			setScrollAmount(getScrollAmount() - mouseY + oldY);
 			return true;
 		} else {

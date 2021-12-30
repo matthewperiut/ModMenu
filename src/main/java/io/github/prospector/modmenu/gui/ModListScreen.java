@@ -166,7 +166,7 @@ public class ModListScreen extends ScreenBase {
 		this.buttons.add(new Button(TOGGLE_SORT_MODE_BUTTON_ID, filtersX, 45, sortingWidth, 20, sortingText) {
 			@Override
 			public void render(Minecraft mc, int mouseX, int mouseY) {
-				visible = filterOptionsShown; // visible = filterOptionsShown
+				visible = active = filterOptionsShown;
 				this.text = "Sort: " + ModMenuConfigManager.getConfig().getSorting().getName();
 				super.render(mc, mouseX, mouseY);
 			}
@@ -174,7 +174,7 @@ public class ModListScreen extends ScreenBase {
 		this.buttons.add(new Button(TOGGLE_SHOW_LIBRARIES_BUTTON_ID, filtersX + sortingWidth + 2, 45, showLibrariesWidth, 20, showLibrariesText) {
 			@Override
 			public void render(Minecraft mc, int mouseX, int mouseY) {
-				visible = filterOptionsShown; // visible = filterOptionsShown
+				visible = active = filterOptionsShown;
 				this.text = ModMenuConfigManager.getConfig().showLibraries() ? "Libraries: Shown" : "Libraries: Hidden";
 				super.render(mc, mouseX, mouseY);
 			}
