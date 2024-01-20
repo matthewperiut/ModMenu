@@ -5,7 +5,7 @@
 
 A picture's worth 2 words
 
-![](https://i.imgur.com/JKEatou.png "Mod Menu")
+![68747470733a2f2f692e696d6775722e636f6d2f4a4b4561746f752e706e67](https://github.com/calmilamsy/ModMenu/assets/8781747/703667a6-1e86-441e-8529-a237cdfa5b8f "Mod Menu")
 
 ### Installation on Beta 1.7.3
 1. Download and install [MultiMC](https://multimc.org/#Download) if you haven't already.
