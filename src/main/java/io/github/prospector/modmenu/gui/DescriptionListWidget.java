@@ -68,7 +68,12 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 
 		@Override
 		public void render(int index, int y, int x, int itemWidth, int itemHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-			textRenderer.drawWithShadow(text, x, y, 0xAAAAAA);
+			try {
+				textRenderer.drawWithShadow(text, x, y, 0xAAAAAA);
+			}
+			catch (Exception ex) {
+
+			}
 		}
 	}
 

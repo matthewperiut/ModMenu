@@ -75,6 +75,8 @@ public class ModMenu implements ClientModInitializer {
 			String id = metadata.getId();
 			if (metadata.containsCustomValue("modmenu:api") && metadata.getCustomValue("modmenu:api").getAsBoolean()) {
 				addLibraryMod(id);
+			} else if (metadata.getAuthors().isEmpty()) {
+				addLibraryMod(id);
 			}
 			if (metadata.containsCustomValue("modmenu:clientsideOnly") && metadata.getCustomValue("modmenu:clientsideOnly").getAsBoolean()) {
 				CLIENTSIDE_MODS.add(id);
