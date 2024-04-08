@@ -2,15 +2,14 @@ package io.github.prospector.modmenu.util;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.screen.ScreenBase;
-import net.minecraft.client.render.TextRenderer;
-
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.screen.Screen;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
-public class RenderUtils extends ScreenBase {
+public class RenderUtils extends Screen {
 
 	public static final RenderUtils INSTANCE = new RenderUtils();
 	private RenderUtils() {}
@@ -25,7 +24,7 @@ public class RenderUtils extends ScreenBase {
 		while (!words.isEmpty()) {
 			String nextWord = words.remove(0);
 			String next = current.isEmpty() ? nextWord : current + " " + nextWord;
-			if (font.getTextWidth(next) > width) {
+			if (font.getWidth(next) > width) {
 				strings.add(current);
 				current = nextWord;
 			} else {
@@ -54,7 +53,7 @@ public class RenderUtils extends ScreenBase {
 				line += "...";
 			}
 			int x1 = x;
-			font.drawText(line, x1, y + i * 9, color);
+			font.draw(line, x1, y + i * 9, color);
 		}
 	}
 
@@ -64,6 +63,6 @@ public class RenderUtils extends ScreenBase {
 		fill(x + 1, y + 1 + 9 - 1, x + tagWidth, y + 9 + 1, outlineColor);
 		fill(x + tagWidth, y, x + tagWidth + 1, y + 9, outlineColor);
 		fill(x + 1, y, x + tagWidth, y + 9, fillColor);
-		font.drawText(text, (x + 1 + (tagWidth - font.getTextWidth(text)) / 2), y + 1, textColor);
+		font.draw(text, (x + 1 + (tagWidth - font.getWidth(text)) / 2), y + 1, textColor);
 	}
 }

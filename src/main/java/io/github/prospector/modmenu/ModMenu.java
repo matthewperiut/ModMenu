@@ -14,8 +14,8 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.CustomValue;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.ScreenBase;
-import net.minecraft.client.gui.screen.menu.Options;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.option.OptionsScreen;
 
 import java.text.NumberFormat;
 import java.util.*;
@@ -30,15 +30,15 @@ public class ModMenu implements ClientModInitializer {
 	public static final Set<String> CLIENTSIDE_MODS = new HashSet<>();
 	public static final Set<String> PATCHWORK_FORGE_MODS = new HashSet<>();
 	public static final LinkedListMultimap<ModContainer, ModContainer> PARENT_MAP = LinkedListMultimap.create();
-	private static ImmutableMap<String, Function<ScreenBase, ? extends ScreenBase>> configScreenFactories = ImmutableMap.of();
+	private static ImmutableMap<String, Function<Screen, ? extends Screen>> configScreenFactories = ImmutableMap.of();
 	private static int libraryCount = 0;
 
 	public static boolean hasConfigScreenFactory(String modid) {
 		return configScreenFactories.containsKey(modid);
 	}
 
-	public static ScreenBase getConfigScreen(String modid, ScreenBase menuScreen) {
-		Function<ScreenBase, ? extends ScreenBase> factory = configScreenFactories.get(modid);
+	public static Screen getConfigScreen(String modid, Screen menuScreen) {
+		Function<Screen, ? extends Screen> factory = configScreenFactories.get(modid);
 		return factory != null ? factory.apply(menuScreen) : null;
 	}
 
@@ -64,9 +64,9 @@ public class ModMenu implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		ModMenuConfigManager.initializeConfig();
-		ImmutableMap.Builder<String, Function<ScreenBase, ? extends ScreenBase>> factories = ImmutableMap.builder();
+		ImmutableMap.Builder<String, Function<Screen, ? extends Screen>> factories = ImmutableMap.builder();
 		FabricLoader.getInstance().getEntrypoints("modmenu", ModMenuApi.class).forEach(api -> factories.put(api.getModId(), api.getConfigScreenFactory()));
-		factories.put("minecraft", (screenBase -> new Options(screenBase, ((Minecraft) FabricLoader.getInstance().getGameInstance()).options)));
+		factories.put("minecraft", (screenBase -> new OptionsScreen(screenBase, ((Minecraft) FabricLoader.getInstance().getGameInstance()).options)));
 		configScreenFactories = factories.build();
 		Collection<ModContainer> mods = FabricLoader.getInstance().getAllMods();
 		HardcodedUtil.initializeHardcodings();

@@ -6,8 +6,8 @@ import io.github.prospector.modmenu.gui.ModListWidget;
 import io.github.prospector.modmenu.util.ModListSearch;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.TextRenderer;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
@@ -34,7 +34,7 @@ public class ParentEntry extends ModListEntry {
 		int childrenBadgeHeight = 9;
 		int childrenBadgeWidth = 9;
 		int children = ModListSearch.search(list.getParent(), list.getParent().getSearchInput(), getChildren()).size();
-		int childrenWidth = font.getTextWidth(Integer.toString(children)) - 1;
+		int childrenWidth = font.getWidth(Integer.toString(children)) - 1;
 		if (childrenBadgeWidth < childrenWidth + 4) {
 			childrenBadgeWidth = childrenWidth + 4;
 		}
@@ -47,7 +47,7 @@ public class ParentEntry extends ModListEntry {
 		fill(childrenBadgeX + childrenBadgeWidth - 1, childrenBadgeY + 1, childrenBadgeX + childrenBadgeWidth, childrenBadgeY + childrenBadgeHeight - 1, childrenOutlineColor);
 		fill(childrenBadgeX + 1, childrenBadgeY + 1, childrenBadgeX + childrenBadgeWidth - 1, childrenBadgeY + childrenBadgeHeight - 1, childrenFillColor);
 		fill(childrenBadgeX + 1, childrenBadgeY + childrenBadgeHeight - 1, childrenBadgeX + childrenBadgeWidth - 1, childrenBadgeY + childrenBadgeHeight, childrenOutlineColor);
-		font.drawText(Integer.toString(children), childrenBadgeX + childrenBadgeWidth / 2 - childrenWidth / 2, childrenBadgeY + 1, 0xCACACA);
+		font.draw(Integer.toString(children), childrenBadgeX + childrenBadgeWidth / 2 - childrenWidth / 2, childrenBadgeY + 1, 0xCACACA);
 		this.hoveringIcon = mouseX >= x - 1 && mouseX <= x - 1 + 32 && mouseY >= y - 1 && mouseY <= y - 1 + 32;
 		if (isMouseOver(mouseX, mouseY)) {
 			fill(x, y, x + 32, y + 32, 0xA0909090);
@@ -56,7 +56,7 @@ public class ParentEntry extends ModListEntry {
 			int yOffset = hoveringIcon ? 32 : 0;
 			GL11.glColor4f(1f, 1f, 1f, 1f);
 			Tessellator tess = Tessellator.INSTANCE;
-			tess.start();
+			tess.startQuads();
 			tess.vertex(x, y, 0, xOffset / 256f, yOffset / 256f);
 			tess.vertex(x, y + 32, 0, xOffset / 256f, (yOffset + 32) / 256f);
 			tess.vertex(x + 32, y + 32, 0, (xOffset + 32) / 256f, (yOffset + 32) / 256f);

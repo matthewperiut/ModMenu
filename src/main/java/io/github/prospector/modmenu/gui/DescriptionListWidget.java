@@ -3,7 +3,7 @@ package io.github.prospector.modmenu.gui;
 import io.github.prospector.modmenu.util.HardcodedUtil;
 import io.github.prospector.modmenu.util.RenderUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.render.TextRenderer;
+import net.minecraft.client.font.TextRenderer;
 
 public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget.DescriptionEntry> {
 
@@ -68,7 +68,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 
 		@Override
 		public void render(int index, int y, int x, int itemWidth, int itemHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-			textRenderer.drawTextWithShadow(text, x, y, 0xAAAAAA);
+			textRenderer.drawWithShadow(text, x, y, 0xAAAAAA);
 		}
 	}
 

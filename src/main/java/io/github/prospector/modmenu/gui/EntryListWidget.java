@@ -9,14 +9,14 @@ import javax.annotation.Nullable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.ScreenBase;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.util.maths.MathHelper;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
 @Environment(EnvType.CLIENT)
-public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extends ScreenBase {
+public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extends Screen {
 	protected static final int DRAG_OUTSIDE = -2;
 	protected final Minecraft minecraft;
 	protected final int itemHeight;
@@ -170,8 +170,8 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 		this.minecraft.textureManager.bindTexture(this.minecraft.textureManager.getTextureId("/gui/background.png"));
 		GL11.glColor4f(1f, 1f, 1f, 1f);
 		float g = 32.0F;
-		tessellator.start();
-		tessellator.colour(32, 32, 32);
+		tessellator.startQuads();
+		tessellator.color(32, 32, 32);
 		tessellator.vertex(this.left, this.bottom, 0.0D, (float)this.left / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F);
 		tessellator.vertex(this.right, this.bottom, 0.0D, (float)this.right / 32.0F, (float)(this.bottom + (int)this.getScrollAmount()) / 32.0F);
 		tessellator.vertex(this.right, this.top, 0.0D, (float)this.right / 32.0F, (float)(this.top + (int)this.getScrollAmount()) / 32.0F);
@@ -193,19 +193,19 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		boolean o = true;
-		tessellator.start();
-		tessellator.colour(0, 0, 0, 0);
+		tessellator.startQuads();
+		tessellator.color(0, 0, 0, 0);
 		tessellator.vertex(this.left, this.top + 4, 0.0D, 0.0F, 1.0F);
 		tessellator.vertex(this.right, this.top + 4, 0.0D, 1.0F, 1.0F);
-		tessellator.colour(0, 0, 0);
+		tessellator.color(0, 0, 0);
 		tessellator.vertex(this.right, this.top, 0.0D, 1.0F, 0.0F);
 		tessellator.vertex(this.left, this.top, 0.0D, 0.0F, 0.0F);
 		tessellator.draw();
-		tessellator.start();
-		tessellator.colour(0, 0, 0);
+		tessellator.startQuads();
+		tessellator.color(0, 0, 0);
 		tessellator.vertex(this.left, this.bottom, 0.0D, 0.0F, 1.0F);
 		tessellator.vertex(this.right, this.bottom, 0.0D, 1.0F, 1.0F);
-		tessellator.colour(0, 0, 0, 0);
+		tessellator.color(0, 0, 0, 0);
 		tessellator.vertex(this.right, this.bottom - 4, 0.0D, 1.0F, 0.0F);
 		tessellator.vertex(this.left, this.bottom - 4, 0.0D, 0.0F, 0.0F);
 		tessellator.draw();
@@ -221,22 +221,22 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 				r = this.top;
 			}
 
-			tessellator.start();
-			tessellator.colour(0, 0, 0);
+			tessellator.startQuads();
+			tessellator.color(0, 0, 0);
 			tessellator.vertex(k, this.bottom, 0.0D, 0.0F, 1.0F);
 			tessellator.vertex(l, this.bottom, 0.0D, 1.0F, 1.0F);
 			tessellator.vertex(l, this.top, 0.0D, 1.0F, 0.0F);
 			tessellator.vertex(k, this.top, 0.0D, 0.0F, 0.0F);
 			tessellator.draw();
-			tessellator.start();
-			tessellator.colour(128, 128, 128);
+			tessellator.startQuads();
+			tessellator.color(128, 128, 128);
 			tessellator.vertex(k, r + q, 0.0D, 0.0F, 1.0F);
 			tessellator.vertex(l, r + q, 0.0D, 1.0F, 1.0F);
 			tessellator.vertex(l, r, 0.0D, 1.0F, 0.0F);
 			tessellator.vertex(k, r, 0.0D, 0.0F, 0.0F);
 			tessellator.draw();
-			tessellator.start();
-			tessellator.colour(192, 192, 192);
+			tessellator.startQuads();
+			tessellator.color(192, 192, 192);
 			tessellator.vertex(k, r + q - 1, 0.0D, 0.0F, 1.0F);
 			tessellator.vertex(l - 1, r + q - 1, 0.0D, 1.0F, 1.0F);
 			tessellator.vertex(l - 1, r, 0.0D, 1.0F, 0.0F);
@@ -399,18 +399,18 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 					GL11.glDisable(GL11.GL_TEXTURE_2D);
 					float g = this.isFocused() ? 1.0F : 0.5F;
 					GL11.glColor4f(g, g, g, 1f);
-					tessellator.start();
-					tessellator.addVertex(v, q + r + 2, 0.0D);
-					tessellator.addVertex(u, q + r + 2, 0.0D);
-					tessellator.addVertex(u, q - 2, 0.0D);
-					tessellator.addVertex(v, q - 2, 0.0D);
+					tessellator.startQuads();
+					tessellator.vertex(v, q + r + 2, 0.0D);
+					tessellator.vertex(u, q + r + 2, 0.0D);
+					tessellator.vertex(u, q - 2, 0.0D);
+					tessellator.vertex(v, q - 2, 0.0D);
 					tessellator.draw();
 					GL11.glColor4f(0f, 0f, 0f, 1f);
-					tessellator.start();
-					tessellator.addVertex(v + 1, q + r + 1, 0.0D);
-					tessellator.addVertex(u - 1, q + r + 1, 0.0D);
-					tessellator.addVertex(u - 1, q - 1, 0.0D);
-					tessellator.addVertex(v + 1, q - 1, 0.0D);
+					tessellator.startQuads();
+					tessellator.vertex(v + 1, q + r + 1, 0.0D);
+					tessellator.vertex(u - 1, q + r + 1, 0.0D);
+					tessellator.vertex(u - 1, q - 1, 0.0D);
+					tessellator.vertex(v + 1, q - 1, 0.0D);
 					tessellator.draw();
 					GL11.glEnable(GL11.GL_TEXTURE_2D);
 				}
@@ -443,11 +443,11 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 		this.minecraft.textureManager.bindTexture(this.minecraft.textureManager.getTextureId("/gui/background.png"));
 		GL11.glColor4f(1f, 1f, 1f, 1f);
 		float f = 32.0F;
-		tessellator.start();
-		tessellator.colour(64, 64, 64, l);
+		tessellator.startQuads();
+		tessellator.color(64, 64, 64, l);
 		tessellator.vertex(this.left, j, 0.0D, 0.0F, (float)j / 32.0F);
 		tessellator.vertex(this.left + this.width, j, 0.0D, (float)this.width / 32.0F, (float)j / 32.0F);
-		tessellator.colour(64, 64, 64, k);
+		tessellator.color(64, 64, 64, k);
 		tessellator.vertex(this.left + this.width, i, 0.0D, (float)this.width / 32.0F, (float)i / 32.0F);
 		tessellator.vertex(this.left, i, 0.0D, 0.0F, (float)i / 32.0F);
 		tessellator.draw();
@@ -500,7 +500,7 @@ public abstract class EntryListWidget<E extends EntryListWidget.Entry<E>> extend
 	}
 
 	@Environment(EnvType.CLIENT)
-	public abstract static class Entry<E extends EntryListWidget.Entry<E>> extends ScreenBase {
+	public abstract static class Entry<E extends EntryListWidget.Entry<E>> extends Screen {
 		@Deprecated
 		EntryListWidget<E> list;
 

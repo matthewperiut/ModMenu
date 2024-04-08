@@ -1,7 +1,7 @@
 package io.github.prospector.modmenu.mixin;
 
-import net.minecraft.client.EnumOperatingSystems;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.OperatingSystem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
@@ -9,8 +9,8 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface MinecraftAccessor {
 
 	@Invoker("getOperatingSystem")
-	static EnumOperatingSystems getOS() {
-		return EnumOperatingSystems.WINDOWS;
+	static OperatingSystem getOS() {
+		return OperatingSystem.WINDOWS;
 	}
 
 }

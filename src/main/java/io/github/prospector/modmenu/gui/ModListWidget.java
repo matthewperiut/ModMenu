@@ -6,15 +6,12 @@ import io.github.prospector.modmenu.gui.entries.ChildEntry;
 import io.github.prospector.modmenu.gui.entries.IndependentEntry;
 import io.github.prospector.modmenu.gui.entries.ParentEntry;
 import io.github.prospector.modmenu.util.ModListSearch;
-import io.github.prospector.modmenu.util.TestModContainer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.ScreenBase;
-import net.minecraft.client.gui.widgets.ScrollableBase;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.util.maths.MathHelper;
+import net.minecraft.util.math.MathHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Mouse;
@@ -26,7 +23,6 @@ import java.util.*;
 
 public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> implements AutoCloseable {
 	private static final Logger LOGGER = LogManager.getLogger();
-	public static final boolean DEBUG = Boolean.getBoolean("modmenu.debug");
 
 	private final Map<Path, BufferedImage> modIconsCache = new HashMap<>();
 	private final ModListScreen parent;
@@ -118,11 +114,6 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 		addedMods.clear();
 		Collection<ModContainer> mods = FabricLoader.getInstance().getAllMods();
 
-		if (DEBUG) {
-			mods = new ArrayList<>(mods);
-			mods.addAll(TestModContainer.getTestModContainers());
-		}
-
 		if (this.modContainerList == null || refresh) {
 			this.modContainerList = new ArrayList<>();
 			modContainerList.addAll(mods);
@@ -198,18 +189,18 @@ public class ModListWidget extends AlwaysSelectedEntryListWidget<ModListEntry> i
 					GL11.glDisable(GL11.GL_TEXTURE_2D);
 					float float_2 = this.isFocused() ? 1.0F : 0.5F;
 					GL11.glColor4f(float_2, float_2, float_2, 1f);
-					tessellator_1.start();
-					tessellator_1.addVertex((double) entryLeft, (double) (entryTop + entryHeight + 2), 0.0D);
-					tessellator_1.addVertex((double) selectionRight, (double) (entryTop + entryHeight + 2), 0.0D);
-					tessellator_1.addVertex((double) selectionRight, (double) (entryTop - 2), 0.0D);
-					tessellator_1.addVertex((double) entryLeft, (double) (entryTop - 2), 0.0D);
+					tessellator_1.startQuads();
+					tessellator_1.vertex((double) entryLeft, (double) (entryTop + entryHeight + 2), 0.0D);
+					tessellator_1.vertex((double) selectionRight, (double) (entryTop + entryHeight + 2), 0.0D);
+					tessellator_1.vertex((double) selectionRight, (double) (entryTop - 2), 0.0D);
+					tessellator_1.vertex((double) entryLeft, (double) (entryTop - 2), 0.0D);
 					tessellator_1.draw();
 					GL11.glColor4f(0f, 0f, 0f, 1f);
-					tessellator_1.start();
-					tessellator_1.addVertex((double) (entryLeft + 1), (double) (entryTop + entryHeight + 1), 0.0D);
-					tessellator_1.addVertex((double) (selectionRight - 1), (double) (entryTop + entryHeight + 1), 0.0D);
-					tessellator_1.addVertex((double) (selectionRight - 1), (double) (entryTop - 1), 0.0D);
-					tessellator_1.addVertex((double) (entryLeft + 1), (double) (entryTop - 1), 0.0D);
+					tessellator_1.startQuads();
+					tessellator_1.vertex((double) (entryLeft + 1), (double) (entryTop + entryHeight + 1), 0.0D);
+					tessellator_1.vertex((double) (selectionRight - 1), (double) (entryTop + entryHeight + 1), 0.0D);
+					tessellator_1.vertex((double) (selectionRight - 1), (double) (entryTop - 1), 0.0D);
+					tessellator_1.vertex((double) (entryLeft + 1), (double) (entryTop - 1), 0.0D);
 					tessellator_1.draw();
 					GL11.glEnable(GL11.GL_TEXTURE_2D);
 				}

@@ -1,12 +1,12 @@
 package io.github.prospector.modmenu.gui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widgets.Button;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.TextRenderer;
 import org.lwjgl.opengl.GL11;
 
-public class ModMenuTexturedButtonWidget extends Button {
+public class ModMenuTexturedButtonWidget extends ButtonWidget {
 	private final String texture;
 	private final int u;
 	private final int v;
@@ -56,20 +56,20 @@ public class ModMenuTexturedButtonWidget extends Button {
 			float uScale = 1f / uWidth;
 			float vScale = 1f / vHeight;
 			Tessellator tess = Tessellator.INSTANCE;
-			tess.start();
+			tess.startQuads();
 			tess.vertex(x, y + height, this.zOffset, (float) u * uScale, (float)(adjustedV + height) * vScale);
 			tess.vertex(x + width, y + height, this.zOffset, ((float)(u + width) * uScale), (float)(adjustedV + height) * vScale);
 			tess.vertex(x + width, y, this.zOffset, (float)(u + width) * uScale, (float)adjustedV * vScale);
 			tess.vertex(x, y, this.zOffset, (float) u * uScale, (float) adjustedV * vScale);
 			tess.draw();
 
-			this.postRender(mc, mouseX, mouseY);
+			this.method_1188(mc, mouseX, mouseY);
 			if (!this.active) {
-				this.drawTextWithShadowCentred(font, this.text, this.x + this.width / 2, this.y + (this.height - 8) / 2, 0xffa0a0a0);
+				this.drawCenteredTextWithShadow(font, this.text, this.x + this.width / 2, this.y + (this.height - 8) / 2, 0xffa0a0a0);
 			} else if (hovered) {
-				this.drawTextWithShadowCentred(font, this.text, this.x + this.width / 2, this.y + (this.height - 8) / 2, 0xffffa0);
+				this.drawCenteredTextWithShadow(font, this.text, this.x + this.width / 2, this.y + (this.height - 8) / 2, 0xffffa0);
 			} else {
-				this.drawTextWithShadowCentred(font, this.text, this.x + this.width / 2, this.y + (this.height - 8) / 2, 0xe0e0e0);
+				this.drawCenteredTextWithShadow(font, this.text, this.x + this.width / 2, this.y + (this.height - 8) / 2, 0xe0e0e0);
 			}
 		}
 	}

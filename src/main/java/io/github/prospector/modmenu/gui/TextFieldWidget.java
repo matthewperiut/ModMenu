@@ -1,10 +1,10 @@
 package io.github.prospector.modmenu.gui;
 
 import io.github.prospector.modmenu.mixin.MinecraftAccessor;
-import net.minecraft.client.EnumOperatingSystems;
-import net.minecraft.client.gui.screen.ScreenBase;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.TextRenderer;
+import net.minecraft.util.OperatingSystem;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
@@ -12,7 +12,7 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.util.function.Predicate;
 
-public class TextFieldWidget extends ScreenBase {
+public class TextFieldWidget extends Screen {
 	private final TextRenderer font;
 	public int x;
 	public int y;
@@ -302,7 +302,7 @@ public class TextFieldWidget extends ScreenBase {
 			return true;
 		} else if (isKeyComboCtrlV(keyCode)) {
 			if (isEnabled) {
-				writeText(ScreenBase.getClipboardContents());
+				writeText(Screen.getClipboard());
 			}
 
 			return true;
@@ -452,8 +452,8 @@ public class TextFieldWidget extends ScreenBase {
 
 			if (!s.isEmpty()) {
 				String s1 = flag ? s.substring(0, j) : s;
-				font.drawTextWithShadow(s1, l, i1, i);
-				j1 += font.getTextWidth(s1) + 1;
+				font.drawWithShadow(s1, l, i1, i);
+				j1 += font.getWidth(s1) + 1;
 			}
 
 			boolean flag2 = cursorPosition < text.length() || text.length() >= getMaxStringLength();
@@ -467,7 +467,7 @@ public class TextFieldWidget extends ScreenBase {
 			}
 
 			if (!s.isEmpty() && flag && j < s.length()) {
-				font.drawTextWithShadow(s.substring(j), j1, i1, i);
+				font.drawWithShadow(s.substring(j), j1, i1, i);
 				//j1 += this.font.getStringWidth(s.substring(j));
 			}
 
@@ -475,12 +475,12 @@ public class TextFieldWidget extends ScreenBase {
 				if (flag2) {
 					fill(k1, i1 - 1, k1 + 1, i1 + 1 + 9, 0xffd0d0d0);
 				} else {
-					font.drawTextWithShadow("_", k1, i1, i);
+					font.drawWithShadow("_", k1, i1, i);
 				}
 			}
 
 			if (k != j) {
-				int l1 = l + font.getTextWidth(s.substring(0, k));
+				int l1 = l + font.getWidth(s.substring(0, k));
 				drawSelectionBox(k1, i1 - 1, l1 - 1, i1 + 1 + 9);
 			}
 		}
@@ -515,11 +515,11 @@ public class TextFieldWidget extends ScreenBase {
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_COLOR_LOGIC_OP);
 		GL11.glLogicOp(GL11.GL_OR_REVERSE);
-		tessellator.start();
-		tessellator.addVertex(startX, endY, 0.0D);
-		tessellator.addVertex(endX, endY, 0.0D);
-		tessellator.addVertex(endX, startY, 0.0D);
-		tessellator.addVertex(startX, startY, 0.0D);
+		tessellator.startQuads();
+		tessellator.vertex(startX, endY, 0.0D);
+		tessellator.vertex(endX, endY, 0.0D);
+		tessellator.vertex(endX, startY, 0.0D);
+		tessellator.vertex(startX, startY, 0.0D);
 		tessellator.draw();
 		GL11.glDisable(GL11.GL_COLOR_LOGIC_OP);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -683,7 +683,7 @@ public class TextFieldWidget extends ScreenBase {
 	}
 
 	private static boolean isCtrlKeyDown() {
-		if (MinecraftAccessor.getOS() == EnumOperatingSystems.MACOS) {
+		if (MinecraftAccessor.getOS() == OperatingSystem.MACOS) {
 			return Keyboard.isKeyDown(Keyboard.KEY_LMETA) || Keyboard.isKeyDown(Keyboard.KEY_RMETA);
 		} else {
 			return Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
@@ -730,7 +730,7 @@ public class TextFieldWidget extends ScreenBase {
 		int width = 0;
 		int length;
 		for (length = 0; length < text.length() && width < maxWidth; length++)
-			width += font.getTextWidth(Character.toString(text.charAt(reverse ? text.length() - 1 - length : length)));
+			width += font.getWidth(Character.toString(text.charAt(reverse ? text.length() - 1 - length : length)));
 		return reverse ? text.substring(text.length() - length) : text.substring(0, length);
 	}
 

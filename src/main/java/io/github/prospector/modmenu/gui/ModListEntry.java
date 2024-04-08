@@ -8,8 +8,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.TextRenderer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
@@ -46,7 +46,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 		this.bindIconTexture();
 		GL11.glEnable(GL11.GL_BLEND);
 		Tessellator tess = Tessellator.INSTANCE;
-		tess.start();
+		tess.startQuads();
 		tess.vertex(x, y, 0, 0, 0);
 		tess.vertex(x, y + 32, 0, 0, 1);
 		tess.vertex(x + 32, y + 32, 0, 1, 1);
@@ -57,16 +57,16 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 		String trimmedName = name;
 		int maxNameWidth = rowWidth - 32 - 3;
 		TextRenderer font = this.client.textRenderer;
-		if (font.getTextWidth(name) > maxNameWidth) {
-			int maxWidth = maxNameWidth - font.getTextWidth("...");
+		if (font.getWidth(name) > maxNameWidth) {
+			int maxWidth = maxNameWidth - font.getWidth("...");
 			trimmedName = "";
-			while (font.getTextWidth(trimmedName) < maxWidth && trimmedName.length() < name.length()) {
+			while (font.getWidth(trimmedName) < maxWidth && trimmedName.length() < name.length()) {
 				trimmedName += name.charAt(trimmedName.length());
 			}
 			trimmedName = trimmedName.isEmpty() ? "..." : trimmedName.substring(0, trimmedName.length() - 1) + "...";
 		}
-		font.drawText(trimmedName, x + 32 + 3, y + 1, 0xFFFFFF);
-		new BadgeRenderer(client, x + 32 + 3 + font.getTextWidth(name) + 2, y, x + rowWidth, container, list.getParent()).draw(mouseX, mouseY);
+		font.draw(trimmedName, x + 32 + 3, y + 1, 0xFFFFFF);
+		new BadgeRenderer(client, x + 32 + 3 + font.getWidth(name) + 2, y, x + rowWidth, container, list.getParent()).draw(mouseX, mouseY);
 		String description = metadata.getDescription();
 		if (description.isEmpty() && HardcodedUtil.getHardcodedDescriptions().containsKey(metadata.getId())) {
 			description = HardcodedUtil.getHardcodedDescription(metadata.getId());
@@ -133,7 +133,7 @@ public class ModListEntry extends AlwaysSelectedEntryListWidget.Entry<ModListEnt
 
 	public void deleteTexture() {
 		if (iconLocation != null) {
-			this.client.textureManager.method_1085(iconLocation); // func_1078_a
+			this.client.textureManager.delete(iconLocation); // func_1078_a
 		}
 	}
 
