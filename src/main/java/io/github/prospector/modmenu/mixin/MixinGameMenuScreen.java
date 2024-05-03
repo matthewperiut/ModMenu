@@ -20,17 +20,15 @@ public class MixinGameMenuScreen extends Screen {
 	public void drawMenuButton(CallbackInfo info) {
 		this.buttons.add(new ButtonWidget(100, this.width / 2 - 100, this.height / 4 + 72 - 16, 98, 20, "Texture Packs"));
 		this.buttons.add(new ModMenuButtonWidget(101, this.width / 2 + 2, this.height / 4 + 72 - 16, 98, 20, "Mods (" + ModMenu.getFormattedModCount() + " loaded)"));
+
+		if (ModMenu.currentTexturePack != this.minecraft.field_2768.field_1175) {
+			ModMenu.currentTexturePack = this.minecraft.field_2768.field_1175;
+			this.minecraft.worldRenderer.method_1537();
+		}
 	}
 
 	@Inject(method = "buttonClicked", at = @At("HEAD"))
 	private void onActionPerformed(ButtonWidget button, CallbackInfo ci) {
-
-		if (button.id == 4) {
-			if (ModMenu.currentTexturePack != this.minecraft.field_2768.field_1175) {
-				ModMenu.currentTexturePack = this.minecraft.field_2768.field_1175;
-				this.minecraft.worldRenderer.method_1537();
-			}
-		}
 		if (button.id == 100) {
 			ModMenu.currentTexturePack = this.minecraft.field_2768.field_1175;
 			minecraft.setScreen(new PackScreen(this));
