@@ -23,7 +23,8 @@ public class MixinGameMenuScreen extends Screen {
 		if (FabricLoader.getInstance().isModLoaded("legacytranslations")) {
 			TranslationStorage var2 = TranslationStorage.getInstance();
 			this.buttons.add(new ButtonWidget(100, this.width / 2 - 100, this.height / 4 + 72 - 16, 98, 20, var2.get("menu.texturepacks")));
-			this.buttons.add(new ModMenuButtonWidget(101, this.width / 2 + 2, this.height / 4 + 72 - 16, 98, 20, var2.get("menu.mods") + " (" + ModMenu.getFormattedModCount() + ")"));
+			String strLoaded = (var2.get("menu.mods.loaded").equals("menu.mods.loaded")) ? "loaded" : var2.get("menu.mods.loaded");
+			this.buttons.add(new ModMenuButtonWidget(101, this.width / 2 + 2, this.height / 4 + 72 - 16, 98, 20, var2.get("menu.mods") + " (" + ModMenu.getFormattedModCount() + " " + strLoaded + ")"));
 
 		} else {
 			this.buttons.add(new ButtonWidget(100, this.width / 2 - 100, this.height / 4 + 72 - 16, 98, 20, "Texture Packs"));

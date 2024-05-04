@@ -26,7 +26,8 @@ public class MixinTitleScreen extends Screen {
 			texturePackButton.text = var2.get("menu.texturepacks");
 			int newWidth = ((MixinGuiButton) texturePackButton).getWidth() / 2 - 1;
 			((MixinGuiButton) texturePackButton).setWidth(newWidth);
-			this.buttons.add(new ModMenuButtonWidget(100, this.width / 2 + 2, texturePackButton.y, newWidth, 20,  var2.get("menu.mods") + " (" + ModMenu.getFormattedModCount() + ")"));
+			String strLoaded = (var2.get("menu.mods.loaded").equals("menu.mods.loaded")) ? "loaded" : var2.get("menu.mods.loaded");
+			this.buttons.add(new ModMenuButtonWidget(100, this.width / 2 + 2, texturePackButton.y, newWidth, 20,  var2.get("menu.mods") + " (" + ModMenu.getFormattedModCount() + " " + strLoaded + ")"));
 		} else {
 			texturePackButton.text = "Texture Packs";
 			int newWidth = ((MixinGuiButton) texturePackButton).getWidth() / 2 - 1;
