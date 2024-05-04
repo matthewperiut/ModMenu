@@ -46,7 +46,7 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 			}
 			if (lastSelected != null && description != null && !description.isEmpty()) {
 				for (String line : RenderUtils.INSTANCE.wrapStringToWidthAsList(textRenderer, description.replaceAll("\n", "\n\n"), getRowWidth())) {
-					children().add(new DescriptionEntry(line));
+					children().add(new DescriptionEntry(textRenderer, line));
 				}
 			}
 		}
@@ -60,15 +60,17 @@ public class DescriptionListWidget extends EntryListWidget<DescriptionListWidget
 	}
 
 	protected class DescriptionEntry extends EntryListWidget.Entry<DescriptionEntry> {
+		protected TextRenderer _textRenderer;
 		protected String text;
 
-		public DescriptionEntry(String text) {
+		public DescriptionEntry(TextRenderer textRenderer1, String text) {
+			this._textRenderer = textRenderer1;
 			this.text = text;
 		}
 
 		@Override
 		public void render(int index, int y, int x, int itemWidth, int itemHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
-			textRenderer.drawWithShadow(text, x, y, 0xAAAAAA);
+			_textRenderer.draw(text, x, y, 0xAAAAAA);
 		}
 	}
 

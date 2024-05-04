@@ -13,6 +13,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.CustomValue;
 import net.fabricmc.loader.api.metadata.ModMetadata;
+import net.minecraft.class_285;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.OptionsScreen;
@@ -32,6 +33,7 @@ public class ModMenu implements ClientModInitializer {
 	public static final LinkedListMultimap<ModContainer, ModContainer> PARENT_MAP = LinkedListMultimap.create();
 	private static ImmutableMap<String, Function<Screen, ? extends Screen>> configScreenFactories = ImmutableMap.of();
 	private static int libraryCount = 0;
+	public static class_285 currentTexturePack;
 
 	public static boolean hasConfigScreenFactory(String modid) {
 		return configScreenFactories.containsKey(modid);
@@ -73,8 +75,15 @@ public class ModMenu implements ClientModInitializer {
 		for (ModContainer mod : mods) {
 			ModMetadata metadata = mod.getMetadata();
 			String id = metadata.getId();
+
 			if (metadata.containsCustomValue("modmenu:api") && metadata.getCustomValue("modmenu:api").getAsBoolean()) {
 				addLibraryMod(id);
+			}
+			if (!id.equals("minecraft") && mod.getMetadata().getType().equals("builtin")) {
+				addLibraryMod(id);
+			}
+			for (ModContainer containedMod : mod.getContainedMods()) {
+				addLibraryMod(containedMod.getMetadata().getId());
 			}
 			if (metadata.containsCustomValue("modmenu:clientsideOnly") && metadata.getCustomValue("modmenu:clientsideOnly").getAsBoolean()) {
 				CLIENTSIDE_MODS.add(id);
