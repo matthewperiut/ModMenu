@@ -37,11 +37,6 @@ repositories {
 		name = 'Froge'
 		url 'https://maven.minecraftforge.net/'
 	}
-	// Used for projects that do not have a maven repository, but do have a GitHub repository with working build scripts.
-	maven {
-		name = 'Jitpack'
-		url = 'https://jitpack.io'
-	}
 	// Used for another StationAPI dependency
 	exclusiveContent {
 		forRepository {
@@ -109,17 +104,24 @@ jar {
 
 // configure the maven publication
 publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
+	repositories {
+		mavenLocal()
+		maven {
+			url = "https://maven.glass-launcher.net/releases"
+			credentials {
+				username "${project.glass_maven_username}"
+				password "${project.glass_maven_password}"
+			}
 		}
 	}
 
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
+	publications {
+		mavenJava(MavenPublication) {
+			artifactId "${archivesBaseName}"
+			artifact ("${project.buildDir.absolutePath}/libs/${archivesBaseName}-${project.version}.jar") {
+				classifier null
+				builtBy remapJar
+			}
+		}
 	}
 }
