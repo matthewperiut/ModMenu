@@ -79,11 +79,13 @@ public class ModMenu implements ClientModInitializer {
 			if (metadata.containsCustomValue("modmenu:api") && metadata.getCustomValue("modmenu:api").getAsBoolean()) {
 				addLibraryMod(id);
 			}
-			if (!id.equals("minecraft") && mod.getMetadata().getType().equals("builtin")) {
+			if (!id.equals("minecraft") && metadata.getType().equals("builtin")) {
 				addLibraryMod(id);
 			}
 			for (ModContainer containedMod : mod.getContainedMods()) {
-				addLibraryMod(containedMod.getMetadata().getId());
+				if(!metadata.containsCustomValue("modmenu:showIfContained") {
+					addLibraryMod(containedMod.getMetadata().getId());
+				}
 			}
 			if (metadata.containsCustomValue("modmenu:clientsideOnly") && metadata.getCustomValue("modmenu:clientsideOnly").getAsBoolean()) {
 				CLIENTSIDE_MODS.add(id);
