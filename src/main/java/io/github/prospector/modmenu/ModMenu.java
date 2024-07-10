@@ -83,7 +83,7 @@ public class ModMenu implements ClientModInitializer {
 				addLibraryMod(id);
 			}
 			for (ModContainer containedMod : mod.getContainedMods()) {
-				if(!metadata.containsCustomValue("modmenu:showIfContained") {
+				if(!metadata.containsCustomValue("modmenu:showIfContained") || !metadata.getCustomValue("modmenu:showIfContained").getAsBoolean()) {
 					addLibraryMod(containedMod.getMetadata().getId());
 				}
 			}
