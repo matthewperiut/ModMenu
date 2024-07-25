@@ -1,6 +1,6 @@
 plugins {
-	id 'fabric-loom' version '1.6.8'
-	id 'babric-loom-extension' version '1.6.8'
+	id 'fabric-loom' version '1.7.2'
+	id 'babric-loom-extension' version '1.7.3'
 	id 'maven-publish'
 }
 
@@ -59,11 +59,6 @@ repositories {
 	mavenCentral()
 }
 
-loom {
-	customMinecraftManifest.set("https://babric.github.io/manifest-polyfill/${minecraft_version}.json")
-	intermediaryUrl.set("https://maven.glass-launcher.net/babric/babric/intermediary/%1\$s/intermediary-%1\$s-v2.jar")
-}
-
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -112,11 +107,13 @@ jar {
 publishing {
 	repositories {
 		mavenLocal()
-		maven {
-			url = "https://maven.glass-launcher.net/releases"
-			credentials {
-				username "${project.glass_maven_username}"
-				password "${project.glass_maven_password}"
+		if (project.hasProperty("glass_maven_username")) {
+			maven {
+				url = "https://maven.glass-launcher.net/releases"
+				credentials {
+					username "${project.glass_maven_username}"
+					password "${project.glass_maven_password}"
+				}
 			}
 		}
 	}
